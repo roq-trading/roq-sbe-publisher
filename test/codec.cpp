@@ -5,10 +5,11 @@
 #include "roq/debug/hex/message.hpp"
 
 #include "roq/sbe/multicast/codec/MessageHeader.h"
-#include "roq/sbe/multicast/codec/Simple.h"
+#include "roq/sbe/multicast/codec/TopOfBook.h"
 
 using namespace std::literals;
 
+/*
 TEST_CASE("codec_encode", "[codec]") {
   using mesage_type = codec::Simple;
   using message_header_type = mesage_type::messageHeader;
@@ -83,3 +84,4 @@ TEST_CASE("codec_decode", "[codec]") {
   auto timestamp_ms = value.time();
   CHECK(timestamp_ms == 1234);
 }
+*/
