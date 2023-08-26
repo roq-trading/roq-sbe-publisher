@@ -1,0 +1,43 @@
+{
+  "name": "Flags",
+  "type": "flags",
+  "values": [
+    {
+      "name": "symbols",
+      "type": "std::string",
+      "description": "symbols"
+    },
+    {
+      "name": "exchange",
+      "type": "std::string",
+      "description": "exchange"
+    },
+    {
+      "name": "local_interface",
+      "type": "std::string",
+      "description": "UDP publish address"
+    },
+    {
+      "name": "multicast_address",
+      "type": "std::string",
+      "description": "UDP publish address"
+    },
+    {
+      "name": "multicast_port",
+      "type": "uint16_t",
+      "description": "UDP publish port"
+    },
+    {
+      "name": "multicast_ttl",
+      "type": "uint16_t",
+      "default": 1,
+      "description": "UDP publish ttl"
+    },
+    {
+      "name": "multicast_loop",
+      "type": "bool",
+      "default": false,
+      "description": "UDP publish loop"
+    }
+  ]
+}

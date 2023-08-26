@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<messageSchema package="com.roq-trading" id="1" version="1" byteOrder="littleEndian">
+  <types>
+    <type name="string16" primitiveType="char" length="16" />
+    <composite name="messageHeader">
+      <type name="blockLength" primitiveType="uint16" />
+      <type name="templateId" primitiveType="uint16" />
+      <type name="schemaId" primitiveType="uint16" />
+      <type name="version" primitiveType="uint16" />
+      <type name="numGroups" primitiveType="uint16" />
+      <type name="numVarDataFields" primitiveType="uint16" />
+    </composite>
+  </types>
+  <message name="simple" id="1001">
+    <field name="name" id="1" type="string16" />
+    <field name="price" id="2" type="double" />
+    <field name="time" id="3" type="uint64" />
+  </message>
+</messageSchema>

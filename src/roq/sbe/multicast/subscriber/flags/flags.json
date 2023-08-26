@@ -1,0 +1,38 @@
+{
+  "name": "Flags",
+  "type": "flags",
+  "values": [
+    {
+      "name": "multicast_address",
+      "type": "std::string",
+      "required": true,
+      "description": "multicast address"
+    },
+    {
+      "name": "multicast_port",
+      "type": "uint16_t",
+      "required": true,
+      "description": "multicast port"
+    },
+    {
+      "name": "local_interface",
+      "type": "std::string",
+      "required": true,
+      "description": "local interface"
+    },
+    {
+      "name": "reorder_buffer_depth",
+      "type": "size_t",
+      "default": 4,
+      "required": true,
+      "description": "depth of reorder buffer"
+    },
+    {
+      "name": "max_packet_size",
+      "type": "size_t",
+      "default": 2048,
+      "required": true,
+      "description": "maximum packet size (used with reorder buffer)"
+    }
+  ]
+}
