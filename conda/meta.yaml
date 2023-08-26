@@ -29,6 +29,7 @@ requirements:
     - roq-io
     - roq-oss-benchmark
     - roq-oss-catch2  # [osx]
+    - roq-sbe
 
 about:
   home: https://roq-trading.com
