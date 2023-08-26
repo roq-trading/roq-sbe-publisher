@@ -1,6 +1,6 @@
 /* Generated SBE (Simple Binary Encoding) message codec */
-#ifndef _CODEC_SIMPLE_CXX_H_
-#define _CODEC_SIMPLE_CXX_H_
+#ifndef _CODEC_MARKETSTATUS_CXX_H_
+#define _CODEC_MARKETSTATUS_CXX_H_
 
 #if defined(SBE_HAVE_CMATH)
 /* cmath needed for std::numeric_limits<double>::quiet_NaN() */
@@ -90,11 +90,17 @@
 #define SBE_NULLVALUE_UINT64 (std::numeric_limits<std::uint64_t>::max)()
 
 
+#include "SecurityType.h"
 #include "MessageHeader.h"
+#include "TradingStatus.h"
+#include "GroupSize.h"
+#include "Layer.h"
+#include "UpdateType.h"
+#include "OptionType.h"
 
 namespace codec {
 
-class Simple
+class MarketStatus
 {
 private:
     char *m_buffer = nullptr;
@@ -110,8 +116,8 @@ private:
     }
 
 public:
-    static const std::uint16_t SBE_BLOCK_LENGTH = static_cast<std::uint16_t>(32);
-    static const std::uint16_t SBE_TEMPLATE_ID = static_cast<std::uint16_t>(1001);
+    static const std::uint16_t SBE_BLOCK_LENGTH = static_cast<std::uint16_t>(81);
+    static const std::uint16_t SBE_TEMPLATE_ID = static_cast<std::uint16_t>(11);
     static const std::uint16_t SBE_SCHEMA_ID = static_cast<std::uint16_t>(1);
     static const std::uint16_t SBE_SCHEMA_VERSION = static_cast<std::uint16_t>(1);
     static constexpr const char* SBE_SEMANTIC_VERSION = "";
@@ -135,9 +141,9 @@ public:
 
     using messageHeader = MessageHeader;
 
-    Simple() = default;
+    MarketStatus() = default;
 
-    Simple(
+    MarketStatus(
         char *buffer,
         const std::uint64_t offset,
         const std::uint64_t bufferLength,
@@ -152,23 +158,23 @@ public:
     {
     }
 
-    Simple(char *buffer, const std::uint64_t bufferLength) :
-        Simple(buffer, 0, bufferLength, sbeBlockLength(), sbeSchemaVersion())
+    MarketStatus(char *buffer, const std::uint64_t bufferLength) :
+        MarketStatus(buffer, 0, bufferLength, sbeBlockLength(), sbeSchemaVersion())
     {
     }
 
-    Simple(
+    MarketStatus(
         char *buffer,
         const std::uint64_t bufferLength,
         const std::uint64_t actingBlockLength,
         const std::uint64_t actingVersion) :
-        Simple(buffer, 0, bufferLength, actingBlockLength, actingVersion)
+        MarketStatus(buffer, 0, bufferLength, actingBlockLength, actingVersion)
     {
     }
 
     SBE_NODISCARD static SBE_CONSTEXPR std::uint16_t sbeBlockLength() SBE_NOEXCEPT
     {
-        return static_cast<std::uint16_t>(32);
+        return static_cast<std::uint16_t>(81);
     }
 
     SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t sbeBlockAndHeaderLength() SBE_NOEXCEPT
@@ -178,7 +184,7 @@ public:
 
     SBE_NODISCARD static SBE_CONSTEXPR std::uint16_t sbeTemplateId() SBE_NOEXCEPT
     {
-        return static_cast<std::uint16_t>(1001);
+        return static_cast<std::uint16_t>(11);
     }
 
     SBE_NODISCARD static SBE_CONSTEXPR std::uint16_t sbeSchemaId() SBE_NOEXCEPT
@@ -206,12 +212,12 @@ public:
         return m_offset;
     }
 
-    Simple &wrapForEncode(char *buffer, const std::uint64_t offset, const std::uint64_t bufferLength)
+    MarketStatus &wrapForEncode(char *buffer, const std::uint64_t offset, const std::uint64_t bufferLength)
     {
-        return *this = Simple(buffer, offset, bufferLength, sbeBlockLength(), sbeSchemaVersion());
+        return *this = MarketStatus(buffer, offset, bufferLength, sbeBlockLength(), sbeSchemaVersion());
     }
 
-    Simple &wrapAndApplyHeader(char *buffer, const std::uint64_t offset, const std::uint64_t bufferLength)
+    MarketStatus &wrapAndApplyHeader(char *buffer, const std::uint64_t offset, const std::uint64_t bufferLength)
     {
         messageHeader hdr(buffer, offset, bufferLength, sbeSchemaVersion());
 
@@ -221,7 +227,7 @@ public:
             .schemaId(sbeSchemaId())
             .version(sbeSchemaVersion());
 
-        return *this = Simple(
+        return *this = MarketStatus(
             buffer,
             offset + messageHeader::encodedLength(),
             bufferLength,
@@ -229,17 +235,17 @@ public:
             sbeSchemaVersion());
     }
 
-    Simple &wrapForDecode(
+    MarketStatus &wrapForDecode(
         char *buffer,
         const std::uint64_t offset,
         const std::uint64_t actingBlockLength,
         const std::uint64_t actingVersion,
         const std::uint64_t bufferLength)
     {
-        return *this = Simple(buffer, offset, bufferLength, actingBlockLength, actingVersion);
+        return *this = MarketStatus(buffer, offset, bufferLength, actingBlockLength, actingVersion);
     }
 
-    Simple &sbeRewind()
+    MarketStatus &sbeRewind()
     {
         return wrapForDecode(m_buffer, m_offset, m_actingBlockLength, m_actingVersion, m_bufferLength);
     }
@@ -271,7 +277,7 @@ public:
 
     SBE_NODISCARD std::uint64_t decodeLength() const
     {
-        Simple skipper(m_buffer, m_offset, m_bufferLength, sbeBlockLength(), m_actingVersion);
+        MarketStatus skipper(m_buffer, m_offset, m_bufferLength, sbeBlockLength(), m_actingVersion);
         skipper.skip();
         return skipper.encodedLength();
     }
@@ -296,7 +302,7 @@ public:
         return m_actingVersion;
     }
 
-    SBE_NODISCARD static const char *nameMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
+    SBE_NODISCARD static const char *exchangeMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
     {
         switch (metaAttribute)
         {
@@ -305,66 +311,66 @@ public:
         }
     }
 
-    static SBE_CONSTEXPR std::uint16_t nameId() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::uint16_t exchangeId() SBE_NOEXCEPT
     {
         return 1;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t nameSinceVersion() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t exchangeSinceVersion() SBE_NOEXCEPT
     {
         return 0;
     }
 
-    SBE_NODISCARD bool nameInActingVersion() SBE_NOEXCEPT
+    SBE_NODISCARD bool exchangeInActingVersion() SBE_NOEXCEPT
     {
         return true;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::size_t nameEncodingOffset() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::size_t exchangeEncodingOffset() SBE_NOEXCEPT
     {
         return 0;
     }
 
-    static SBE_CONSTEXPR char nameNullValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR char exchangeNullValue() SBE_NOEXCEPT
     {
         return static_cast<char>(0);
     }
 
-    static SBE_CONSTEXPR char nameMinValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR char exchangeMinValue() SBE_NOEXCEPT
     {
         return static_cast<char>(32);
     }
 
-    static SBE_CONSTEXPR char nameMaxValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR char exchangeMaxValue() SBE_NOEXCEPT
     {
         return static_cast<char>(126);
     }
 
-    static SBE_CONSTEXPR std::size_t nameEncodingLength() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::size_t exchangeEncodingLength() SBE_NOEXCEPT
     {
-        return 16;
+        return 32;
     }
 
-    static SBE_CONSTEXPR std::uint64_t nameLength() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::uint64_t exchangeLength() SBE_NOEXCEPT
     {
-        return 16;
+        return 32;
     }
 
-    SBE_NODISCARD const char *name() const SBE_NOEXCEPT
+    SBE_NODISCARD const char *exchange() const SBE_NOEXCEPT
     {
         return m_buffer + m_offset + 0;
     }
 
-    SBE_NODISCARD char *name() SBE_NOEXCEPT
+    SBE_NODISCARD char *exchange() SBE_NOEXCEPT
     {
         return m_buffer + m_offset + 0;
     }
 
-    SBE_NODISCARD char name(const std::uint64_t index) const
+    SBE_NODISCARD char exchange(const std::uint64_t index) const
     {
-        if (index >= 16)
+        if (index >= 32)
         {
-            throw std::runtime_error("index out of range for name [E104]");
+            throw std::runtime_error("index out of range for exchange [E104]");
         }
 
         char val;
@@ -372,11 +378,11 @@ public:
         return (val);
     }
 
-    Simple &name(const std::uint64_t index, const char value)
+    MarketStatus &exchange(const std::uint64_t index, const char value)
     {
-        if (index >= 16)
+        if (index >= 32)
         {
-            throw std::runtime_error("index out of range for name [E105]");
+            throw std::runtime_error("index out of range for exchange [E105]");
         }
 
         char val = (value);
@@ -384,38 +390,38 @@ public:
         return *this;
     }
 
-    std::uint64_t getName(char *const dst, const std::uint64_t length) const
+    std::uint64_t getExchange(char *const dst, const std::uint64_t length) const
     {
-        if (length > 16)
+        if (length > 32)
         {
-            throw std::runtime_error("length too large for getName [E106]");
+            throw std::runtime_error("length too large for getExchange [E106]");
         }
 
         std::memcpy(dst, m_buffer + m_offset + 0, sizeof(char) * static_cast<std::size_t>(length));
         return length;
     }
 
-    Simple &putName(const char *const src) SBE_NOEXCEPT
+    MarketStatus &putExchange(const char *const src) SBE_NOEXCEPT
     {
-        std::memcpy(m_buffer + m_offset + 0, src, sizeof(char) * 16);
+        std::memcpy(m_buffer + m_offset + 0, src, sizeof(char) * 32);
         return *this;
     }
 
-    SBE_NODISCARD std::string getNameAsString() const
+    SBE_NODISCARD std::string getExchangeAsString() const
     {
         const char *buffer = m_buffer + m_offset + 0;
         std::size_t length = 0;
 
-        for (; length < 16 && *(buffer + length) != '\0'; ++length);
+        for (; length < 32 && *(buffer + length) != '\0'; ++length);
         std::string result(buffer, length);
 
         return result;
     }
 
-    std::string getNameAsJsonEscapedString()
+    std::string getExchangeAsJsonEscapedString()
     {
         std::ostringstream oss;
-        std::string s = getNameAsString();
+        std::string s = getExchangeAsString();
 
         for (const auto c : s)
         {
@@ -446,12 +452,12 @@ public:
     }
 
     #if __cplusplus >= 201703L
-    SBE_NODISCARD std::string_view getNameAsStringView() const SBE_NOEXCEPT
+    SBE_NODISCARD std::string_view getExchangeAsStringView() const SBE_NOEXCEPT
     {
         const char *buffer = m_buffer + m_offset + 0;
         std::size_t length = 0;
 
-        for (; length < 16 && *(buffer + length) != '\0'; ++length);
+        for (; length < 32 && *(buffer + length) != '\0'; ++length);
         std::string_view result(buffer, length);
 
         return result;
@@ -459,16 +465,16 @@ public:
     #endif
 
     #if __cplusplus >= 201703L
-    Simple &putName(const std::string_view str)
+    MarketStatus &putExchange(const std::string_view str)
     {
         const std::size_t srcLength = str.length();
-        if (srcLength > 16)
+        if (srcLength > 32)
         {
-            throw std::runtime_error("string too large for putName [E106]");
+            throw std::runtime_error("string too large for putExchange [E106]");
         }
 
         std::memcpy(m_buffer + m_offset + 0, str.data(), srcLength);
-        for (std::size_t start = srcLength; start < 16; ++start)
+        for (std::size_t start = srcLength; start < 32; ++start)
         {
             m_buffer[m_offset + 0 + start] = 0;
         }
@@ -476,16 +482,16 @@ public:
         return *this;
     }
     #else
-    Simple &putName(const std::string &str)
+    MarketStatus &putExchange(const std::string &str)
     {
         const std::size_t srcLength = str.length();
-        if (srcLength > 16)
+        if (srcLength > 32)
         {
-            throw std::runtime_error("string too large for putName [E106]");
+            throw std::runtime_error("string too large for putExchange [E106]");
         }
 
         std::memcpy(m_buffer + m_offset + 0, str.c_str(), srcLength);
-        for (std::size_t start = srcLength; start < 16; ++start)
+        for (std::size_t start = srcLength; start < 32; ++start)
         {
             m_buffer[m_offset + 0 + start] = 0;
         }
@@ -494,7 +500,7 @@ public:
     }
     #endif
 
-    SBE_NODISCARD static const char *priceMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
+    SBE_NODISCARD static const char *symbolMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
     {
         switch (metaAttribute)
         {
@@ -503,64 +509,196 @@ public:
         }
     }
 
-    static SBE_CONSTEXPR std::uint16_t priceId() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::uint16_t symbolId() SBE_NOEXCEPT
     {
         return 2;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t priceSinceVersion() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t symbolSinceVersion() SBE_NOEXCEPT
     {
         return 0;
     }
 
-    SBE_NODISCARD bool priceInActingVersion() SBE_NOEXCEPT
+    SBE_NODISCARD bool symbolInActingVersion() SBE_NOEXCEPT
     {
         return true;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::size_t priceEncodingOffset() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::size_t symbolEncodingOffset() SBE_NOEXCEPT
     {
-        return 16;
+        return 32;
     }
 
-    static SBE_CONSTEXPR double priceNullValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR char symbolNullValue() SBE_NOEXCEPT
     {
-        return SBE_DOUBLE_NAN;
+        return static_cast<char>(0);
     }
 
-    static SBE_CONSTEXPR double priceMinValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR char symbolMinValue() SBE_NOEXCEPT
     {
-        return 4.9E-324;
+        return static_cast<char>(32);
     }
 
-    static SBE_CONSTEXPR double priceMaxValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR char symbolMaxValue() SBE_NOEXCEPT
     {
-        return 1.7976931348623157E308;
+        return static_cast<char>(126);
     }
 
-    static SBE_CONSTEXPR std::size_t priceEncodingLength() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::size_t symbolEncodingLength() SBE_NOEXCEPT
     {
-        return 8;
+        return 48;
     }
 
-    SBE_NODISCARD double price() const SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::uint64_t symbolLength() SBE_NOEXCEPT
     {
-        union sbe_double_as_uint_u val;
-        std::memcpy(&val, m_buffer + m_offset + 16, sizeof(double));
-        val.uint_value = SBE_LITTLE_ENDIAN_ENCODE_64(val.uint_value);
-        return val.fp_value;
+        return 48;
     }
 
-    Simple &price(const double value) SBE_NOEXCEPT
+    SBE_NODISCARD const char *symbol() const SBE_NOEXCEPT
     {
-        union sbe_double_as_uint_u val;
-        val.fp_value = value;
-        val.uint_value = SBE_LITTLE_ENDIAN_ENCODE_64(val.uint_value);
-        std::memcpy(m_buffer + m_offset + 16, &val, sizeof(double));
+        return m_buffer + m_offset + 32;
+    }
+
+    SBE_NODISCARD char *symbol() SBE_NOEXCEPT
+    {
+        return m_buffer + m_offset + 32;
+    }
+
+    SBE_NODISCARD char symbol(const std::uint64_t index) const
+    {
+        if (index >= 48)
+        {
+            throw std::runtime_error("index out of range for symbol [E104]");
+        }
+
+        char val;
+        std::memcpy(&val, m_buffer + m_offset + 32 + (index * 1), sizeof(char));
+        return (val);
+    }
+
+    MarketStatus &symbol(const std::uint64_t index, const char value)
+    {
+        if (index >= 48)
+        {
+            throw std::runtime_error("index out of range for symbol [E105]");
+        }
+
+        char val = (value);
+        std::memcpy(m_buffer + m_offset + 32 + (index * 1), &val, sizeof(char));
         return *this;
     }
 
-    SBE_NODISCARD static const char *timeMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
+    std::uint64_t getSymbol(char *const dst, const std::uint64_t length) const
+    {
+        if (length > 48)
+        {
+            throw std::runtime_error("length too large for getSymbol [E106]");
+        }
+
+        std::memcpy(dst, m_buffer + m_offset + 32, sizeof(char) * static_cast<std::size_t>(length));
+        return length;
+    }
+
+    MarketStatus &putSymbol(const char *const src) SBE_NOEXCEPT
+    {
+        std::memcpy(m_buffer + m_offset + 32, src, sizeof(char) * 48);
+        return *this;
+    }
+
+    SBE_NODISCARD std::string getSymbolAsString() const
+    {
+        const char *buffer = m_buffer + m_offset + 32;
+        std::size_t length = 0;
+
+        for (; length < 48 && *(buffer + length) != '\0'; ++length);
+        std::string result(buffer, length);
+
+        return result;
+    }
+
+    std::string getSymbolAsJsonEscapedString()
+    {
+        std::ostringstream oss;
+        std::string s = getSymbolAsString();
+
+        for (const auto c : s)
+        {
+            switch (c)
+            {
+                case '"': oss << "\\\""; break;
+                case '\\': oss << "\\\\"; break;
+                case '\b': oss << "\\b"; break;
+                case '\f': oss << "\\f"; break;
+                case '\n': oss << "\\n"; break;
+                case '\r': oss << "\\r"; break;
+                case '\t': oss << "\\t"; break;
+
+                default:
+                    if ('\x00' <= c && c <= '\x1f')
+                    {
+                        oss << "\\u" << std::hex << std::setw(4)
+                            << std::setfill('0') << (int)(c);
+                    }
+                    else
+                    {
+                        oss << c;
+                    }
+            }
+        }
+
+        return oss.str();
+    }
+
+    #if __cplusplus >= 201703L
+    SBE_NODISCARD std::string_view getSymbolAsStringView() const SBE_NOEXCEPT
+    {
+        const char *buffer = m_buffer + m_offset + 32;
+        std::size_t length = 0;
+
+        for (; length < 48 && *(buffer + length) != '\0'; ++length);
+        std::string_view result(buffer, length);
+
+        return result;
+    }
+    #endif
+
+    #if __cplusplus >= 201703L
+    MarketStatus &putSymbol(const std::string_view str)
+    {
+        const std::size_t srcLength = str.length();
+        if (srcLength > 48)
+        {
+            throw std::runtime_error("string too large for putSymbol [E106]");
+        }
+
+        std::memcpy(m_buffer + m_offset + 32, str.data(), srcLength);
+        for (std::size_t start = srcLength; start < 48; ++start)
+        {
+            m_buffer[m_offset + 32 + start] = 0;
+        }
+
+        return *this;
+    }
+    #else
+    MarketStatus &putSymbol(const std::string &str)
+    {
+        const std::size_t srcLength = str.length();
+        if (srcLength > 48)
+        {
+            throw std::runtime_error("string too large for putSymbol [E106]");
+        }
+
+        std::memcpy(m_buffer + m_offset + 32, str.c_str(), srcLength);
+        for (std::size_t start = srcLength; start < 48; ++start)
+        {
+            m_buffer[m_offset + 32 + start] = 0;
+        }
+
+        return *this;
+    }
+    #endif
+
+    SBE_NODISCARD static const char *tradingStatusMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
     {
         switch (metaAttribute)
         {
@@ -569,65 +707,57 @@ public:
         }
     }
 
-    static SBE_CONSTEXPR std::uint16_t timeId() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::uint16_t tradingStatusId() SBE_NOEXCEPT
     {
         return 3;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t timeSinceVersion() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t tradingStatusSinceVersion() SBE_NOEXCEPT
     {
         return 0;
     }
 
-    SBE_NODISCARD bool timeInActingVersion() SBE_NOEXCEPT
+    SBE_NODISCARD bool tradingStatusInActingVersion() SBE_NOEXCEPT
     {
         return true;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::size_t timeEncodingOffset() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::size_t tradingStatusEncodingOffset() SBE_NOEXCEPT
     {
-        return 24;
+        return 80;
     }
 
-    static SBE_CONSTEXPR std::uint64_t timeNullValue() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::size_t tradingStatusEncodingLength() SBE_NOEXCEPT
     {
-        return SBE_NULLVALUE_UINT64;
+        return 1;
     }
 
-    static SBE_CONSTEXPR std::uint64_t timeMinValue() SBE_NOEXCEPT
+    SBE_NODISCARD std::uint8_t tradingStatusRaw() const SBE_NOEXCEPT
     {
-        return UINT64_C(0x0);
+        std::uint8_t val;
+        std::memcpy(&val, m_buffer + m_offset + 80, sizeof(std::uint8_t));
+        return (val);
     }
 
-    static SBE_CONSTEXPR std::uint64_t timeMaxValue() SBE_NOEXCEPT
+    SBE_NODISCARD TradingStatus::Value tradingStatus() const
     {
-        return UINT64_C(0xfffffffffffffffe);
+        std::uint8_t val;
+        std::memcpy(&val, m_buffer + m_offset + 80, sizeof(std::uint8_t));
+        return TradingStatus::get((val));
     }
 
-    static SBE_CONSTEXPR std::size_t timeEncodingLength() SBE_NOEXCEPT
+    MarketStatus &tradingStatus(const TradingStatus::Value value) SBE_NOEXCEPT
     {
-        return 8;
-    }
-
-    SBE_NODISCARD std::uint64_t time() const SBE_NOEXCEPT
-    {
-        std::uint64_t val;
-        std::memcpy(&val, m_buffer + m_offset + 24, sizeof(std::uint64_t));
-        return SBE_LITTLE_ENDIAN_ENCODE_64(val);
-    }
-
-    Simple &time(const std::uint64_t value) SBE_NOEXCEPT
-    {
-        std::uint64_t val = SBE_LITTLE_ENDIAN_ENCODE_64(value);
-        std::memcpy(m_buffer + m_offset + 24, &val, sizeof(std::uint64_t));
+        std::uint8_t val = (value);
+        std::memcpy(m_buffer + m_offset + 80, &val, sizeof(std::uint8_t));
         return *this;
     }
 
 template<typename CharT, typename Traits>
 friend std::basic_ostream<CharT, Traits> & operator << (
-    std::basic_ostream<CharT, Traits> &builder, const Simple &_writer)
+    std::basic_ostream<CharT, Traits> &builder, const MarketStatus &_writer)
 {
-    Simple writer(
+    MarketStatus writer(
         _writer.m_buffer,
         _writer.m_offset,
         _writer.m_bufferLength,
@@ -635,22 +765,23 @@ friend std::basic_ostream<CharT, Traits> & operator << (
         _writer.m_actingVersion);
 
     builder << '{';
-    builder << R"("Name": "Simple", )";
+    builder << R"("Name": "MarketStatus", )";
     builder << R"("sbeTemplateId": )";
     builder << writer.sbeTemplateId();
     builder << ", ";
 
-    builder << R"("name": )";
+    builder << R"("exchange": )";
     builder << '"' <<
-        writer.getNameAsJsonEscapedString().c_str() << '"';
+        writer.getExchangeAsJsonEscapedString().c_str() << '"';
 
     builder << ", ";
-    builder << R"("price": )";
-    builder << +writer.price();
+    builder << R"("symbol": )";
+    builder << '"' <<
+        writer.getSymbolAsJsonEscapedString().c_str() << '"';
 
     builder << ", ";
-    builder << R"("time": )";
-    builder << +writer.time();
+    builder << R"("tradingStatus": )";
+    builder << '"' << writer.tradingStatus() << '"';
 
     builder << '}';
 

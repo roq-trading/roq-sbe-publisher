@@ -1,6 +1,6 @@
 /* Generated SBE (Simple Binary Encoding) message codec */
-#ifndef _CODEC_MESSAGEHEADER_CXX_H_
-#define _CODEC_MESSAGEHEADER_CXX_H_
+#ifndef _CODEC_GROUPSIZE_CXX_H_
+#define _CODEC_GROUPSIZE_CXX_H_
 
 #if defined(SBE_HAVE_CMATH)
 /* cmath needed for std::numeric_limits<double>::quiet_NaN() */
@@ -92,7 +92,7 @@
 
 namespace codec {
 
-class MessageHeader
+class GroupSize
 {
 private:
     char *m_buffer = nullptr;
@@ -118,9 +118,9 @@ public:
         std::uint64_t uint_value;
     };
 
-    MessageHeader() = default;
+    GroupSize() = default;
 
-    MessageHeader(
+    GroupSize(
         char *buffer,
         const std::uint64_t offset,
         const std::uint64_t bufferLength,
@@ -130,39 +130,39 @@ public:
         m_offset(offset),
         m_actingVersion(actingVersion)
     {
-        if (SBE_BOUNDS_CHECK_EXPECT(((m_offset + 8) > m_bufferLength), false))
+        if (SBE_BOUNDS_CHECK_EXPECT(((m_offset + 3) > m_bufferLength), false))
         {
             throw std::runtime_error("buffer too short for flyweight [E107]");
         }
     }
 
-    MessageHeader(
+    GroupSize(
         char *buffer,
         const std::uint64_t bufferLength,
         const std::uint64_t actingVersion) :
-        MessageHeader(buffer, 0, bufferLength, actingVersion)
+        GroupSize(buffer, 0, bufferLength, actingVersion)
     {
     }
 
-    MessageHeader(
+    GroupSize(
         char *buffer,
         const std::uint64_t bufferLength) :
-        MessageHeader(buffer, 0, bufferLength, sbeSchemaVersion())
+        GroupSize(buffer, 0, bufferLength, sbeSchemaVersion())
     {
     }
 
-    MessageHeader &wrap(
+    GroupSize &wrap(
         char *buffer,
         const std::uint64_t offset,
         const std::uint64_t actingVersion,
         const std::uint64_t bufferLength)
     {
-        return *this = MessageHeader(buffer, offset, bufferLength, actingVersion);
+        return *this = GroupSize(buffer, offset, bufferLength, actingVersion);
     }
 
     SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t encodedLength() SBE_NOEXCEPT
     {
-        return 8;
+        return 3;
     }
 
     SBE_NODISCARD std::uint64_t offset() const SBE_NOEXCEPT
@@ -256,14 +256,14 @@ public:
         return SBE_LITTLE_ENDIAN_ENCODE_16(val);
     }
 
-    MessageHeader &blockLength(const std::uint16_t value) SBE_NOEXCEPT
+    GroupSize &blockLength(const std::uint16_t value) SBE_NOEXCEPT
     {
         std::uint16_t val = SBE_LITTLE_ENDIAN_ENCODE_16(value);
         std::memcpy(m_buffer + m_offset + 0, &val, sizeof(std::uint16_t));
         return *this;
     }
 
-    SBE_NODISCARD static const char *templateIdMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
+    SBE_NODISCARD static const char *numInGroupMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
     {
         switch (metaAttribute)
         {
@@ -272,205 +272,71 @@ public:
         }
     }
 
-    static SBE_CONSTEXPR std::uint16_t templateIdId() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::uint16_t numInGroupId() SBE_NOEXCEPT
     {
         return -1;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t templateIdSinceVersion() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t numInGroupSinceVersion() SBE_NOEXCEPT
     {
         return 0;
     }
 
-    SBE_NODISCARD bool templateIdInActingVersion() SBE_NOEXCEPT
+    SBE_NODISCARD bool numInGroupInActingVersion() SBE_NOEXCEPT
     {
         return true;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::size_t templateIdEncodingOffset() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::size_t numInGroupEncodingOffset() SBE_NOEXCEPT
     {
         return 2;
     }
 
-    static SBE_CONSTEXPR std::uint16_t templateIdNullValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::uint8_t numInGroupNullValue() SBE_NOEXCEPT
     {
-        return SBE_NULLVALUE_UINT16;
+        return SBE_NULLVALUE_UINT8;
     }
 
-    static SBE_CONSTEXPR std::uint16_t templateIdMinValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::uint8_t numInGroupMinValue() SBE_NOEXCEPT
     {
-        return static_cast<std::uint16_t>(0);
+        return static_cast<std::uint8_t>(0);
     }
 
-    static SBE_CONSTEXPR std::uint16_t templateIdMaxValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::uint8_t numInGroupMaxValue() SBE_NOEXCEPT
     {
-        return static_cast<std::uint16_t>(65534);
+        return static_cast<std::uint8_t>(254);
     }
 
-    static SBE_CONSTEXPR std::size_t templateIdEncodingLength() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::size_t numInGroupEncodingLength() SBE_NOEXCEPT
     {
-        return 2;
+        return 1;
     }
 
-    SBE_NODISCARD std::uint16_t templateId() const SBE_NOEXCEPT
+    SBE_NODISCARD std::uint8_t numInGroup() const SBE_NOEXCEPT
     {
-        std::uint16_t val;
-        std::memcpy(&val, m_buffer + m_offset + 2, sizeof(std::uint16_t));
-        return SBE_LITTLE_ENDIAN_ENCODE_16(val);
+        std::uint8_t val;
+        std::memcpy(&val, m_buffer + m_offset + 2, sizeof(std::uint8_t));
+        return (val);
     }
 
-    MessageHeader &templateId(const std::uint16_t value) SBE_NOEXCEPT
+    GroupSize &numInGroup(const std::uint8_t value) SBE_NOEXCEPT
     {
-        std::uint16_t val = SBE_LITTLE_ENDIAN_ENCODE_16(value);
-        std::memcpy(m_buffer + m_offset + 2, &val, sizeof(std::uint16_t));
-        return *this;
-    }
-
-    SBE_NODISCARD static const char *schemaIdMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
-    {
-        switch (metaAttribute)
-        {
-            case MetaAttribute::PRESENCE: return "required";
-            default: return "";
-        }
-    }
-
-    static SBE_CONSTEXPR std::uint16_t schemaIdId() SBE_NOEXCEPT
-    {
-        return -1;
-    }
-
-    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t schemaIdSinceVersion() SBE_NOEXCEPT
-    {
-        return 0;
-    }
-
-    SBE_NODISCARD bool schemaIdInActingVersion() SBE_NOEXCEPT
-    {
-        return true;
-    }
-
-    SBE_NODISCARD static SBE_CONSTEXPR std::size_t schemaIdEncodingOffset() SBE_NOEXCEPT
-    {
-        return 4;
-    }
-
-    static SBE_CONSTEXPR std::uint16_t schemaIdNullValue() SBE_NOEXCEPT
-    {
-        return SBE_NULLVALUE_UINT16;
-    }
-
-    static SBE_CONSTEXPR std::uint16_t schemaIdMinValue() SBE_NOEXCEPT
-    {
-        return static_cast<std::uint16_t>(0);
-    }
-
-    static SBE_CONSTEXPR std::uint16_t schemaIdMaxValue() SBE_NOEXCEPT
-    {
-        return static_cast<std::uint16_t>(65534);
-    }
-
-    static SBE_CONSTEXPR std::size_t schemaIdEncodingLength() SBE_NOEXCEPT
-    {
-        return 2;
-    }
-
-    SBE_NODISCARD std::uint16_t schemaId() const SBE_NOEXCEPT
-    {
-        std::uint16_t val;
-        std::memcpy(&val, m_buffer + m_offset + 4, sizeof(std::uint16_t));
-        return SBE_LITTLE_ENDIAN_ENCODE_16(val);
-    }
-
-    MessageHeader &schemaId(const std::uint16_t value) SBE_NOEXCEPT
-    {
-        std::uint16_t val = SBE_LITTLE_ENDIAN_ENCODE_16(value);
-        std::memcpy(m_buffer + m_offset + 4, &val, sizeof(std::uint16_t));
-        return *this;
-    }
-
-    SBE_NODISCARD static const char *versionMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
-    {
-        switch (metaAttribute)
-        {
-            case MetaAttribute::PRESENCE: return "required";
-            default: return "";
-        }
-    }
-
-    static SBE_CONSTEXPR std::uint16_t versionId() SBE_NOEXCEPT
-    {
-        return -1;
-    }
-
-    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t versionSinceVersion() SBE_NOEXCEPT
-    {
-        return 0;
-    }
-
-    SBE_NODISCARD bool versionInActingVersion() SBE_NOEXCEPT
-    {
-        return true;
-    }
-
-    SBE_NODISCARD static SBE_CONSTEXPR std::size_t versionEncodingOffset() SBE_NOEXCEPT
-    {
-        return 6;
-    }
-
-    static SBE_CONSTEXPR std::uint16_t versionNullValue() SBE_NOEXCEPT
-    {
-        return SBE_NULLVALUE_UINT16;
-    }
-
-    static SBE_CONSTEXPR std::uint16_t versionMinValue() SBE_NOEXCEPT
-    {
-        return static_cast<std::uint16_t>(0);
-    }
-
-    static SBE_CONSTEXPR std::uint16_t versionMaxValue() SBE_NOEXCEPT
-    {
-        return static_cast<std::uint16_t>(65534);
-    }
-
-    static SBE_CONSTEXPR std::size_t versionEncodingLength() SBE_NOEXCEPT
-    {
-        return 2;
-    }
-
-    SBE_NODISCARD std::uint16_t version() const SBE_NOEXCEPT
-    {
-        std::uint16_t val;
-        std::memcpy(&val, m_buffer + m_offset + 6, sizeof(std::uint16_t));
-        return SBE_LITTLE_ENDIAN_ENCODE_16(val);
-    }
-
-    MessageHeader &version(const std::uint16_t value) SBE_NOEXCEPT
-    {
-        std::uint16_t val = SBE_LITTLE_ENDIAN_ENCODE_16(value);
-        std::memcpy(m_buffer + m_offset + 6, &val, sizeof(std::uint16_t));
+        std::uint8_t val = (value);
+        std::memcpy(m_buffer + m_offset + 2, &val, sizeof(std::uint8_t));
         return *this;
     }
 
 template<typename CharT, typename Traits>
 friend std::basic_ostream<CharT, Traits> & operator << (
-    std::basic_ostream<CharT, Traits> &builder, MessageHeader &writer)
+    std::basic_ostream<CharT, Traits> &builder, GroupSize &writer)
 {
     builder << '{';
     builder << R"("blockLength": )";
     builder << +writer.blockLength();
 
     builder << ", ";
-    builder << R"("templateId": )";
-    builder << +writer.templateId();
-
-    builder << ", ";
-    builder << R"("schemaId": )";
-    builder << +writer.schemaId();
-
-    builder << ", ";
-    builder << R"("version": )";
-    builder << +writer.version();
+    builder << R"("numInGroup": )";
+    builder << +writer.numInGroup();
 
     builder << '}';
 

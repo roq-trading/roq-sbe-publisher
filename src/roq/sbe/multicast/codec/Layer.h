@@ -1,6 +1,6 @@
 /* Generated SBE (Simple Binary Encoding) message codec */
-#ifndef _CODEC_MESSAGEHEADER_CXX_H_
-#define _CODEC_MESSAGEHEADER_CXX_H_
+#ifndef _CODEC_LAYER_CXX_H_
+#define _CODEC_LAYER_CXX_H_
 
 #if defined(SBE_HAVE_CMATH)
 /* cmath needed for std::numeric_limits<double>::quiet_NaN() */
@@ -92,7 +92,7 @@
 
 namespace codec {
 
-class MessageHeader
+class Layer
 {
 private:
     char *m_buffer = nullptr;
@@ -118,9 +118,9 @@ public:
         std::uint64_t uint_value;
     };
 
-    MessageHeader() = default;
+    Layer() = default;
 
-    MessageHeader(
+    Layer(
         char *buffer,
         const std::uint64_t offset,
         const std::uint64_t bufferLength,
@@ -130,39 +130,39 @@ public:
         m_offset(offset),
         m_actingVersion(actingVersion)
     {
-        if (SBE_BOUNDS_CHECK_EXPECT(((m_offset + 8) > m_bufferLength), false))
+        if (SBE_BOUNDS_CHECK_EXPECT(((m_offset + 32) > m_bufferLength), false))
         {
             throw std::runtime_error("buffer too short for flyweight [E107]");
         }
     }
 
-    MessageHeader(
+    Layer(
         char *buffer,
         const std::uint64_t bufferLength,
         const std::uint64_t actingVersion) :
-        MessageHeader(buffer, 0, bufferLength, actingVersion)
+        Layer(buffer, 0, bufferLength, actingVersion)
     {
     }
 
-    MessageHeader(
+    Layer(
         char *buffer,
         const std::uint64_t bufferLength) :
-        MessageHeader(buffer, 0, bufferLength, sbeSchemaVersion())
+        Layer(buffer, 0, bufferLength, sbeSchemaVersion())
     {
     }
 
-    MessageHeader &wrap(
+    Layer &wrap(
         char *buffer,
         const std::uint64_t offset,
         const std::uint64_t actingVersion,
         const std::uint64_t bufferLength)
     {
-        return *this = MessageHeader(buffer, offset, bufferLength, actingVersion);
+        return *this = Layer(buffer, offset, bufferLength, actingVersion);
     }
 
     SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t encodedLength() SBE_NOEXCEPT
     {
-        return 8;
+        return 32;
     }
 
     SBE_NODISCARD std::uint64_t offset() const SBE_NOEXCEPT
@@ -200,7 +200,7 @@ public:
         return static_cast<std::uint16_t>(1);
     }
 
-    SBE_NODISCARD static const char *blockLengthMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
+    SBE_NODISCARD static const char *bidPriceMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
     {
         switch (metaAttribute)
         {
@@ -209,61 +209,64 @@ public:
         }
     }
 
-    static SBE_CONSTEXPR std::uint16_t blockLengthId() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::uint16_t bidPriceId() SBE_NOEXCEPT
     {
         return -1;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t blockLengthSinceVersion() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t bidPriceSinceVersion() SBE_NOEXCEPT
     {
         return 0;
     }
 
-    SBE_NODISCARD bool blockLengthInActingVersion() SBE_NOEXCEPT
+    SBE_NODISCARD bool bidPriceInActingVersion() SBE_NOEXCEPT
     {
         return true;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::size_t blockLengthEncodingOffset() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::size_t bidPriceEncodingOffset() SBE_NOEXCEPT
     {
         return 0;
     }
 
-    static SBE_CONSTEXPR std::uint16_t blockLengthNullValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR double bidPriceNullValue() SBE_NOEXCEPT
     {
-        return SBE_NULLVALUE_UINT16;
+        return SBE_DOUBLE_NAN;
     }
 
-    static SBE_CONSTEXPR std::uint16_t blockLengthMinValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR double bidPriceMinValue() SBE_NOEXCEPT
     {
-        return static_cast<std::uint16_t>(0);
+        return 4.9E-324;
     }
 
-    static SBE_CONSTEXPR std::uint16_t blockLengthMaxValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR double bidPriceMaxValue() SBE_NOEXCEPT
     {
-        return static_cast<std::uint16_t>(65534);
+        return 1.7976931348623157E308;
     }
 
-    static SBE_CONSTEXPR std::size_t blockLengthEncodingLength() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::size_t bidPriceEncodingLength() SBE_NOEXCEPT
     {
-        return 2;
+        return 8;
     }
 
-    SBE_NODISCARD std::uint16_t blockLength() const SBE_NOEXCEPT
+    SBE_NODISCARD double bidPrice() const SBE_NOEXCEPT
     {
-        std::uint16_t val;
-        std::memcpy(&val, m_buffer + m_offset + 0, sizeof(std::uint16_t));
-        return SBE_LITTLE_ENDIAN_ENCODE_16(val);
+        union sbe_double_as_uint_u val;
+        std::memcpy(&val, m_buffer + m_offset + 0, sizeof(double));
+        val.uint_value = SBE_LITTLE_ENDIAN_ENCODE_64(val.uint_value);
+        return val.fp_value;
     }
 
-    MessageHeader &blockLength(const std::uint16_t value) SBE_NOEXCEPT
+    Layer &bidPrice(const double value) SBE_NOEXCEPT
     {
-        std::uint16_t val = SBE_LITTLE_ENDIAN_ENCODE_16(value);
-        std::memcpy(m_buffer + m_offset + 0, &val, sizeof(std::uint16_t));
+        union sbe_double_as_uint_u val;
+        val.fp_value = value;
+        val.uint_value = SBE_LITTLE_ENDIAN_ENCODE_64(val.uint_value);
+        std::memcpy(m_buffer + m_offset + 0, &val, sizeof(double));
         return *this;
     }
 
-    SBE_NODISCARD static const char *templateIdMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
+    SBE_NODISCARD static const char *bidQuantityMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
     {
         switch (metaAttribute)
         {
@@ -272,61 +275,64 @@ public:
         }
     }
 
-    static SBE_CONSTEXPR std::uint16_t templateIdId() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::uint16_t bidQuantityId() SBE_NOEXCEPT
     {
         return -1;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t templateIdSinceVersion() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t bidQuantitySinceVersion() SBE_NOEXCEPT
     {
         return 0;
     }
 
-    SBE_NODISCARD bool templateIdInActingVersion() SBE_NOEXCEPT
+    SBE_NODISCARD bool bidQuantityInActingVersion() SBE_NOEXCEPT
     {
         return true;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::size_t templateIdEncodingOffset() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::size_t bidQuantityEncodingOffset() SBE_NOEXCEPT
     {
-        return 2;
+        return 8;
     }
 
-    static SBE_CONSTEXPR std::uint16_t templateIdNullValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR double bidQuantityNullValue() SBE_NOEXCEPT
     {
-        return SBE_NULLVALUE_UINT16;
+        return SBE_DOUBLE_NAN;
     }
 
-    static SBE_CONSTEXPR std::uint16_t templateIdMinValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR double bidQuantityMinValue() SBE_NOEXCEPT
     {
-        return static_cast<std::uint16_t>(0);
+        return 4.9E-324;
     }
 
-    static SBE_CONSTEXPR std::uint16_t templateIdMaxValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR double bidQuantityMaxValue() SBE_NOEXCEPT
     {
-        return static_cast<std::uint16_t>(65534);
+        return 1.7976931348623157E308;
     }
 
-    static SBE_CONSTEXPR std::size_t templateIdEncodingLength() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::size_t bidQuantityEncodingLength() SBE_NOEXCEPT
     {
-        return 2;
+        return 8;
     }
 
-    SBE_NODISCARD std::uint16_t templateId() const SBE_NOEXCEPT
+    SBE_NODISCARD double bidQuantity() const SBE_NOEXCEPT
     {
-        std::uint16_t val;
-        std::memcpy(&val, m_buffer + m_offset + 2, sizeof(std::uint16_t));
-        return SBE_LITTLE_ENDIAN_ENCODE_16(val);
+        union sbe_double_as_uint_u val;
+        std::memcpy(&val, m_buffer + m_offset + 8, sizeof(double));
+        val.uint_value = SBE_LITTLE_ENDIAN_ENCODE_64(val.uint_value);
+        return val.fp_value;
     }
 
-    MessageHeader &templateId(const std::uint16_t value) SBE_NOEXCEPT
+    Layer &bidQuantity(const double value) SBE_NOEXCEPT
     {
-        std::uint16_t val = SBE_LITTLE_ENDIAN_ENCODE_16(value);
-        std::memcpy(m_buffer + m_offset + 2, &val, sizeof(std::uint16_t));
+        union sbe_double_as_uint_u val;
+        val.fp_value = value;
+        val.uint_value = SBE_LITTLE_ENDIAN_ENCODE_64(val.uint_value);
+        std::memcpy(m_buffer + m_offset + 8, &val, sizeof(double));
         return *this;
     }
 
-    SBE_NODISCARD static const char *schemaIdMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
+    SBE_NODISCARD static const char *askPriceMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
     {
         switch (metaAttribute)
         {
@@ -335,61 +341,64 @@ public:
         }
     }
 
-    static SBE_CONSTEXPR std::uint16_t schemaIdId() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::uint16_t askPriceId() SBE_NOEXCEPT
     {
         return -1;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t schemaIdSinceVersion() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t askPriceSinceVersion() SBE_NOEXCEPT
     {
         return 0;
     }
 
-    SBE_NODISCARD bool schemaIdInActingVersion() SBE_NOEXCEPT
+    SBE_NODISCARD bool askPriceInActingVersion() SBE_NOEXCEPT
     {
         return true;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::size_t schemaIdEncodingOffset() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::size_t askPriceEncodingOffset() SBE_NOEXCEPT
     {
-        return 4;
+        return 16;
     }
 
-    static SBE_CONSTEXPR std::uint16_t schemaIdNullValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR double askPriceNullValue() SBE_NOEXCEPT
     {
-        return SBE_NULLVALUE_UINT16;
+        return SBE_DOUBLE_NAN;
     }
 
-    static SBE_CONSTEXPR std::uint16_t schemaIdMinValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR double askPriceMinValue() SBE_NOEXCEPT
     {
-        return static_cast<std::uint16_t>(0);
+        return 4.9E-324;
     }
 
-    static SBE_CONSTEXPR std::uint16_t schemaIdMaxValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR double askPriceMaxValue() SBE_NOEXCEPT
     {
-        return static_cast<std::uint16_t>(65534);
+        return 1.7976931348623157E308;
     }
 
-    static SBE_CONSTEXPR std::size_t schemaIdEncodingLength() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::size_t askPriceEncodingLength() SBE_NOEXCEPT
     {
-        return 2;
+        return 8;
     }
 
-    SBE_NODISCARD std::uint16_t schemaId() const SBE_NOEXCEPT
+    SBE_NODISCARD double askPrice() const SBE_NOEXCEPT
     {
-        std::uint16_t val;
-        std::memcpy(&val, m_buffer + m_offset + 4, sizeof(std::uint16_t));
-        return SBE_LITTLE_ENDIAN_ENCODE_16(val);
+        union sbe_double_as_uint_u val;
+        std::memcpy(&val, m_buffer + m_offset + 16, sizeof(double));
+        val.uint_value = SBE_LITTLE_ENDIAN_ENCODE_64(val.uint_value);
+        return val.fp_value;
     }
 
-    MessageHeader &schemaId(const std::uint16_t value) SBE_NOEXCEPT
+    Layer &askPrice(const double value) SBE_NOEXCEPT
     {
-        std::uint16_t val = SBE_LITTLE_ENDIAN_ENCODE_16(value);
-        std::memcpy(m_buffer + m_offset + 4, &val, sizeof(std::uint16_t));
+        union sbe_double_as_uint_u val;
+        val.fp_value = value;
+        val.uint_value = SBE_LITTLE_ENDIAN_ENCODE_64(val.uint_value);
+        std::memcpy(m_buffer + m_offset + 16, &val, sizeof(double));
         return *this;
     }
 
-    SBE_NODISCARD static const char *versionMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
+    SBE_NODISCARD static const char *askQuantityMetaAttribute(const MetaAttribute metaAttribute) SBE_NOEXCEPT
     {
         switch (metaAttribute)
         {
@@ -398,79 +407,82 @@ public:
         }
     }
 
-    static SBE_CONSTEXPR std::uint16_t versionId() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::uint16_t askQuantityId() SBE_NOEXCEPT
     {
         return -1;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t versionSinceVersion() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::uint64_t askQuantitySinceVersion() SBE_NOEXCEPT
     {
         return 0;
     }
 
-    SBE_NODISCARD bool versionInActingVersion() SBE_NOEXCEPT
+    SBE_NODISCARD bool askQuantityInActingVersion() SBE_NOEXCEPT
     {
         return true;
     }
 
-    SBE_NODISCARD static SBE_CONSTEXPR std::size_t versionEncodingOffset() SBE_NOEXCEPT
+    SBE_NODISCARD static SBE_CONSTEXPR std::size_t askQuantityEncodingOffset() SBE_NOEXCEPT
     {
-        return 6;
+        return 24;
     }
 
-    static SBE_CONSTEXPR std::uint16_t versionNullValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR double askQuantityNullValue() SBE_NOEXCEPT
     {
-        return SBE_NULLVALUE_UINT16;
+        return SBE_DOUBLE_NAN;
     }
 
-    static SBE_CONSTEXPR std::uint16_t versionMinValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR double askQuantityMinValue() SBE_NOEXCEPT
     {
-        return static_cast<std::uint16_t>(0);
+        return 4.9E-324;
     }
 
-    static SBE_CONSTEXPR std::uint16_t versionMaxValue() SBE_NOEXCEPT
+    static SBE_CONSTEXPR double askQuantityMaxValue() SBE_NOEXCEPT
     {
-        return static_cast<std::uint16_t>(65534);
+        return 1.7976931348623157E308;
     }
 
-    static SBE_CONSTEXPR std::size_t versionEncodingLength() SBE_NOEXCEPT
+    static SBE_CONSTEXPR std::size_t askQuantityEncodingLength() SBE_NOEXCEPT
     {
-        return 2;
+        return 8;
     }
 
-    SBE_NODISCARD std::uint16_t version() const SBE_NOEXCEPT
+    SBE_NODISCARD double askQuantity() const SBE_NOEXCEPT
     {
-        std::uint16_t val;
-        std::memcpy(&val, m_buffer + m_offset + 6, sizeof(std::uint16_t));
-        return SBE_LITTLE_ENDIAN_ENCODE_16(val);
+        union sbe_double_as_uint_u val;
+        std::memcpy(&val, m_buffer + m_offset + 24, sizeof(double));
+        val.uint_value = SBE_LITTLE_ENDIAN_ENCODE_64(val.uint_value);
+        return val.fp_value;
     }
 
-    MessageHeader &version(const std::uint16_t value) SBE_NOEXCEPT
+    Layer &askQuantity(const double value) SBE_NOEXCEPT
     {
-        std::uint16_t val = SBE_LITTLE_ENDIAN_ENCODE_16(value);
-        std::memcpy(m_buffer + m_offset + 6, &val, sizeof(std::uint16_t));
+        union sbe_double_as_uint_u val;
+        val.fp_value = value;
+        val.uint_value = SBE_LITTLE_ENDIAN_ENCODE_64(val.uint_value);
+        std::memcpy(m_buffer + m_offset + 24, &val, sizeof(double));
         return *this;
     }
 
 template<typename CharT, typename Traits>
 friend std::basic_ostream<CharT, Traits> & operator << (
-    std::basic_ostream<CharT, Traits> &builder, MessageHeader &writer)
+    std::basic_ostream<CharT, Traits> &builder, Layer &writer)
 {
     builder << '{';
-    builder << R"("blockLength": )";
-    builder << +writer.blockLength();
+    builder << R"("bidPrice": )";
+    builder << +writer.bidPrice();
 
     builder << ", ";
-    builder << R"("templateId": )";
-    builder << +writer.templateId();
+    builder << R"("bidQuantity": )";
+    builder << +writer.bidQuantity();
 
     builder << ", ";
-    builder << R"("schemaId": )";
-    builder << +writer.schemaId();
+    builder << R"("askPrice": )";
+    builder << +writer.askPrice();
 
     builder << ", ";
-    builder << R"("version": )";
-    builder << +writer.version();
+    builder << R"("askQuantity": )";
+    builder << +writer.askQuantity();
 
     builder << '}';
 
