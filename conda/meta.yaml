@@ -1,12 +1,18 @@
 package:
-  name: roq-sbe-multicast-test
-  version: 1.0
+  name: roq-sbe-publisher
+  version: {{ GIT_DESCRIBE_TAG }}
 
 source:
   git_url: ..
 
-build:
-  skip: true  # [not unix]
+build:                                                                                                                  
+  skip: true  # [not unix]                                                                                              
+  number: {{ ROQ_BUILD_NUMBER if ROQ_BUILD_NUMBER is defined else GIT_DESCRIBE_NUMBER }}                                
+  script_env:                                                                                                           
+    - ROQ_BUILD_NUMBER                                                                                                  
+    - ROQ_BUILD_TYPE                                                                                                    
+  run_exports:                                                                                                          
+    - {{ pin_subpackage('roq-sbe-publisher', max_pin='x.x.x') }}
 
 requirements:
   build:
@@ -25,7 +31,10 @@ requirements:
     - roq-oss-catch2  # [osx]
 
 about:
-  license: MIT
-  license_family: MIT
+  home: https://roq-trading.com
+  doc_url: https://roq-trading.com/docs
+  dev_url: https://github.com/roq-trading
+  license: Commercial
+  license_family: PROPRIETARY
   license_file: LICENSE
-  summary: Roq SBE/multicast Test
+  summary: Roq SBE Publisher

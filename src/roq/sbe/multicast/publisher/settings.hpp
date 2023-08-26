@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <fmt/chrono.h>
 #include <fmt/compile.h>
 #include <fmt/format.h>
 

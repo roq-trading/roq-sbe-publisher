@@ -1,7 +1,5 @@
 set(TARGET_NAME ${PROJECT_NAME}-publisher-flags)
 
-set(SOURCES flags.cpp)
-
 include(RoqAutogen)
 
 set(AUTOGEN_SCHEMAS flags.json)
@@ -12,7 +10,7 @@ roq_autogen(
   NAMESPACE
   "roq/sbe/multicast/publisher/flags"
   OUTPUT_TYPE
-  "flags"
+  "state"
   FILE_TYPE
   "hpp"
   SOURCES
@@ -26,7 +24,7 @@ roq_autogen(
   NAMESPACE
   "roq/sbe/multicast/publisher/flags"
   OUTPUT_TYPE
-  "flags"
+  "state"
   FILE_TYPE
   "cpp"
   SOURCES

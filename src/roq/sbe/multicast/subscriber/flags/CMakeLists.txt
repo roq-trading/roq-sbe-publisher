@@ -10,7 +10,7 @@ roq_autogen(
   NAMESPACE
   "roq/sbe/multicast/subscriber/flags"
   OUTPUT_TYPE
-  "flags"
+  "state"
   FILE_TYPE
   "hpp"
   SOURCES
@@ -24,7 +24,7 @@ roq_autogen(
   NAMESPACE
   "roq/sbe/multicast/subscriber/flags"
   OUTPUT_TYPE
-  "flags"
+  "state"
   FILE_TYPE
   "cpp"
   SOURCES

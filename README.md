@@ -1,1 +1,1 @@
-SBE publisher + subscriber
+SBE publisher
