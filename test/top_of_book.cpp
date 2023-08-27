@@ -4,46 +4,44 @@
 
 #include "roq/debug/hex/message.hpp"
 
-#include "roq_sbe/MessageHeader.h"
-#include "roq_sbe/TopOfBook.h"
+#include "roq/sbe/codec/decoder.hpp"
+#include "roq/sbe/codec/encoder.hpp"
 
 using namespace std::literals;
 
+using namespace roq;
+
+// === CONSTANTS ===
+
+namespace {
+auto const EXCHANGE = "deribit"sv;
+auto const SYMBOL = "BTC-PERPETUAL"sv;
+}  // namespace
+
+// === IMPLEMENTATION ===
+
 TEST_CASE("top_of_book_encode", "[top_of_book]") {
-  using mesage_type = roq_sbe::TopOfBook;
-  using message_header_type = roq_sbe::MessageHeader;
-
   std::vector<std::byte> buffer(4096);
-
-  mesage_type value;
-
-  auto &result = value.wrapAndApplyHeader(reinterpret_cast<char *>(std::data(buffer)), 0, std::size(buffer));
-
-  result.putExchange("deribit"sv);
-  result.putSymbol("BTC-PERPETUAL"sv);
-  auto &layer = result.layer();
-  layer.bidPrice(123.4);
-  layer.bidQuantity(1.234);
-  layer.askPrice(234.5);
-  layer.askQuantity(2.345);
-  result.updateType(roq_sbe::UpdateType::Value::Incremental);
-  result.exchangeTimeUTC(1234);
-  result.exchangeSequence(2345);
-  result.sendingTimeUTC(3456);
-
-  auto length = message_header_type::encodedLength() + mesage_type::computeLength();
-  CHECK(length == 145);  // see next test
-
-  std::span message{std::data(buffer), length};
-
-  fmt::print("{}\n"sv, roq::debug::hex::Message{message});
-}
-
-TEST_CASE("top_of_book_decode", "[top_of_book]") {
-  using mesage_type = roq_sbe::TopOfBook;
-  using message_header_type = roq_sbe::MessageHeader;
-
-  auto const message =
+  auto top_of_book = TopOfBook{
+      .exchange = EXCHANGE,
+      .symbol = SYMBOL,
+      .layer =
+          {
+              .bid_price = 123.4,
+              .bid_quantity = 1.234,
+              .ask_price = 234.5,
+              .ask_quantity = 2.345,
+          },
+      .update_type = UpdateType::INCREMENTAL,
+      .exchange_time_utc = 1234ns,
+      .exchange_sequence = 2345,
+      .sending_time_utc = 3456ns,
+  };
+  auto message_1 = sbe::codec::Encoder::encode(buffer, top_of_book);
+  fmt::print("{}\n"sv, roq::debug::hex::Message{message_1});
+  REQUIRE(std::size(message_1) == 145);
+  std::string_view text_1{reinterpret_cast<char const *>(std::data(message_1)), std::size(message_1)};
+  auto const text_2 =
       "\x89\x00"  // block length (137)
       "\x0c\x00"  // template id (12)
       "\x01\x00"  // schema id (1)
@@ -61,52 +59,33 @@ TEST_CASE("top_of_book_decode", "[top_of_book]") {
       "\xd2\x04\x00\x00\x00\x00\x00\x00"     // exchange time utc
       "\x29\x09\x00\x00\x00\x00\x00\x00"     // exchange sequence
       "\x80\x0d\x00\x00\x00\x00\x00\x00"sv;  // sending time utc
-  REQUIRE(std::size(message) == 145);
+  REQUIRE(std::size(text_2) == 145);
+  CHECK(text_1 == text_2);
+  std::span message_2{reinterpret_cast<std::byte const *>(std::data(text_2)), std::size(text_2)};
 
-  std::span payload{reinterpret_cast<std::byte const *>(std::data(message)), std::size(message)};
+  struct Handler final : public sbe::codec::Decoder::Handler {
+    explicit Handler(TopOfBook const &source) : source_{source} {}
+    void operator()(ReferenceData const &) { FAIL(); }
+    void operator()(MarketStatus const &) { FAIL(); }
+    void operator()(TopOfBook const &top_of_book) {
+      found = true;
+      CHECK(top_of_book.exchange == source_.exchange);
+      CHECK(top_of_book.symbol == source_.symbol);
+      CHECK(top_of_book.layer.bid_price == Catch::Approx{source_.layer.bid_price});
+      CHECK(top_of_book.layer.bid_quantity == Catch::Approx{source_.layer.bid_quantity});
+      CHECK(top_of_book.layer.ask_price == Catch::Approx{source_.layer.ask_price});
+      CHECK(top_of_book.layer.ask_quantity == Catch::Approx{source_.layer.ask_quantity});
+      CHECK(top_of_book.update_type == source_.update_type);
+      CHECK(top_of_book.exchange_time_utc == source_.exchange_time_utc);
+      CHECK(top_of_book.exchange_sequence == source_.exchange_sequence);
+      CHECK(top_of_book.sending_time_utc == source_.sending_time_utc);
+    }
+    bool found = false;
 
-  // note! SBE is *not* const-safe
-
-  // - message header
-  message_header_type message_header{
-      reinterpret_cast<char *>(const_cast<std::byte *>(std::data(payload))), std::size(payload)};
-  auto message_header_length = message_header_type::encodedLength();
-  CHECK(message_header_length == 8);
-  auto block_length = message_header.blockLength();
-  CHECK(block_length == 137);
-  auto template_id = message_header.templateId();
-  REQUIRE(template_id == 12);
-  auto schema_id = message_header.schemaId();
-  CHECK(schema_id == 1);
-  auto version = message_header.version();
-  CHECK(version == 1);
-
-  // - message
-  auto payload_2 = payload.subspan(message_header_length);
-  mesage_type value{
-      reinterpret_cast<char *>(const_cast<std::byte *>(std::data(payload_2))),
-      std::size(payload_2),
-      block_length,
-      version};
-  auto message_length = value.computeLength();
-  CHECK(message_length == 137);
-  CHECK((message_header_length + message_length) == std::size(message));
-  value.sbeRewind();  // note! here it's not needed -- but with variable lists, it seems to be
-  auto exchange = value.getExchangeAsStringView();
-  CHECK(exchange == "deribit"sv);
-  auto symbol = value.getSymbolAsStringView();
-  CHECK(symbol == "BTC-PERPETUAL"sv);
-  auto &layer = value.layer();
-  CHECK(layer.bidPrice() == Catch::Approx{123.4});
-  CHECK(layer.bidQuantity() == Catch::Approx{1.234});
-  CHECK(layer.askPrice() == Catch::Approx{234.5});
-  CHECK(layer.askQuantity() == Catch::Approx{2.345});
-  auto update_type = value.updateType();
-  CHECK(update_type == roq_sbe::UpdateType::Value::Incremental);
-  auto exchange_time_utc = value.exchangeTimeUTC();
-  CHECK(exchange_time_utc == 1234);
-  auto exchange_sequence = value.exchangeSequence();
-  CHECK(exchange_sequence == 2345);
-  auto sending_time_utc = value.sendingTimeUTC();
-  CHECK(sending_time_utc == 3456);
+   private:
+    TopOfBook const &source_;
+  } handler{top_of_book};
+  auto bytes = sbe::codec::Decoder::decode(handler, message_2);
+  CHECK(handler.found == true);
+  CHECK(bytes == std::size(message_1));
 }

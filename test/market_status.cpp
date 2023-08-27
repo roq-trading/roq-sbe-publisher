@@ -4,38 +4,34 @@
 
 #include "roq/debug/hex/message.hpp"
 
-#include "roq_sbe/MarketStatus.h"
-#include "roq_sbe/MessageHeader.h"
+#include "roq/sbe/codec/decoder.hpp"
+#include "roq/sbe/codec/encoder.hpp"
 
 using namespace std::literals;
 
+using namespace roq;
+
+// === CONSTANTS ===
+
+namespace {
+auto const EXCHANGE = "deribit"sv;
+auto const SYMBOL = "BTC-PERPETUAL"sv;
+}  // namespace
+
+// === IMPLEMENTATION ===
+
 TEST_CASE("market_status_encode", "[market_status]") {
-  using mesage_type = roq_sbe::MarketStatus;
-  using message_header_type = roq_sbe::MessageHeader;
-
   std::vector<std::byte> buffer(4096);
-
-  mesage_type value;
-
-  auto &result = value.wrapAndApplyHeader(reinterpret_cast<char *>(std::data(buffer)), 0, std::size(buffer));
-
-  result.putExchange("deribit"sv);
-  result.putSymbol("BTC-PERPETUAL"sv);
-  result.tradingStatus(roq_sbe::TradingStatus::Value::Open);
-
-  auto length = message_header_type::encodedLength() + mesage_type::computeLength();
-  CHECK(length == 89);  // see next test
-
-  std::span message{std::data(buffer), length};
-
-  fmt::print("{}\n"sv, roq::debug::hex::Message{message});
-}
-
-TEST_CASE("market_status_decode", "[market_status]") {
-  using mesage_type = roq_sbe::MarketStatus;
-  using message_header_type = roq_sbe::MessageHeader;
-
-  auto const message =
+  auto market_status = MarketStatus{
+      .exchange = EXCHANGE,
+      .symbol = SYMBOL,
+      .trading_status = TradingStatus::OPEN,
+  };
+  auto message_1 = sbe::codec::Encoder::encode(buffer, market_status);
+  fmt::print("{}\n"sv, roq::debug::hex::Message{message_1});
+  REQUIRE(std::size(message_1) == 89);
+  std::string_view text_1{reinterpret_cast<char const *>(std::data(message_1)), std::size(message_1)};
+  auto const text_2 =
       "\x51\x00"  // block length (81)
       "\x0b\x00"  // template id (11)
       "\x01\x00"  // schema id (1)
@@ -46,41 +42,26 @@ TEST_CASE("market_status_decode", "[market_status]") {
       "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
       "\x00\x00\x00\x00\x00\x00\x00\x00"  // symbol
       "\x05"sv;                           // trading status (open)
-  REQUIRE(std::size(message) == 89);
+  REQUIRE(std::size(text_2) == 89);
+  CHECK(text_1 == text_2);
+  std::span message_2{reinterpret_cast<std::byte const *>(std::data(text_2)), std::size(text_2)};
 
-  std::span payload{reinterpret_cast<std::byte const *>(std::data(message)), std::size(message)};
+  struct Handler final : public sbe::codec::Decoder::Handler {
+    explicit Handler(MarketStatus const &source) : source_{source} {}
+    void operator()(ReferenceData const &) { FAIL(); }
+    void operator()(MarketStatus const &market_status) {
+      found = true;
+      CHECK(market_status.exchange == source_.exchange);
+      CHECK(market_status.symbol == source_.symbol);
+      CHECK(market_status.trading_status == source_.trading_status);
+    }
+    void operator()(TopOfBook const &) { FAIL(); }
+    bool found = false;
 
-  // note! SBE is *not* const-safe
-
-  // - message header
-  message_header_type message_header{
-      reinterpret_cast<char *>(const_cast<std::byte *>(std::data(payload))), std::size(payload)};
-  auto message_header_length = message_header_type::encodedLength();
-  CHECK(message_header_length == 8);
-  auto block_length = message_header.blockLength();
-  CHECK(block_length == 81);
-  auto template_id = message_header.templateId();
-  REQUIRE(template_id == 11);
-  auto schema_id = message_header.schemaId();
-  CHECK(schema_id == 1);
-  auto version = message_header.version();
-  CHECK(version == 1);
-
-  // - message
-  auto payload_2 = payload.subspan(message_header_length);
-  mesage_type value{
-      reinterpret_cast<char *>(const_cast<std::byte *>(std::data(payload_2))),
-      std::size(payload_2),
-      block_length,
-      version};
-  auto message_length = value.computeLength();
-  CHECK(message_length == 81);
-  CHECK((message_header_length + message_length) == std::size(message));
-  value.sbeRewind();  // note! here it's not needed -- but with variable lists, it seems to be
-  auto exchange = value.getExchangeAsStringView();
-  CHECK(exchange == "deribit"sv);
-  auto symbol = value.getSymbolAsStringView();
-  CHECK(symbol == "BTC-PERPETUAL"sv);
-  auto trading_status = value.tradingStatus();
-  CHECK(trading_status == roq_sbe::TradingStatus::Value::Open);
+   private:
+    MarketStatus const &source_;
+  } handler{market_status};
+  auto bytes = sbe::codec::Decoder::decode(handler, message_2);
+  CHECK(handler.found == true);
+  CHECK(bytes == std::size(message_1));
 }

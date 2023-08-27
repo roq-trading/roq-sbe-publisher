@@ -6,7 +6,8 @@ roq_gitignore(OUTPUT .gitignore SOURCES ${TARGET_NAME})
 
 add_executable(${TARGET_NAME} ${SOURCES})
 
-target_link_libraries(${TARGET_NAME} PRIVATE roq-logging::roq-logging Catch2::Catch2)
+target_link_libraries(${TARGET_NAME} PRIVATE ${PROJECT_NAME}-codec roq-logging::roq-logging
+                                             Catch2::Catch2)
 
 set_target_properties(${TARGET_NAME} PROPERTIES LINK_FLAGS_RELEASE -s)
 

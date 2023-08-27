@@ -4,59 +4,56 @@
 
 #include "roq/debug/hex/message.hpp"
 
-#include "roq_sbe/MessageHeader.h"
-#include "roq_sbe/ReferenceData.h"
+#include "roq/sbe/codec/decoder.hpp"
+#include "roq/sbe/codec/encoder.hpp"
 
 using namespace std::literals;
 
+using namespace roq;
+
+// === CONSTANTS ===
+
+namespace {
+auto const EXCHANGE = "deribit"sv;
+auto const SYMBOL = "BTC-PERPETUAL"sv;
+auto const DESCRIPTION = "AbcDef123"sv;
+}  // namespace
+
+// === IMPLEMENTATION ===
+
 TEST_CASE("reference_data_encode", "[reference_data]") {
-  using mesage_type = roq_sbe::ReferenceData;
-  using message_header_type = roq_sbe::MessageHeader;
-
   std::vector<std::byte> buffer(4096);
-
-  mesage_type value;
-
-  auto &result = value.wrapAndApplyHeader(reinterpret_cast<char *>(std::data(buffer)), 0, std::size(buffer));
-
-  result.putExchange("deribit"sv);
-  result.putSymbol("BTC-PERPETUAL"sv);
-  result.putDescription("AbcDef123"sv);
-  result.security_type(roq_sbe::SecurityType::Value::Swap);  // XXX
-  result.putBaseCurrency("BTC"sv);
-  result.putQuoteCurrency("USD"sv);
-  result.putMarginCurrency("USD"sv);
-  result.putCommissionCurrency("USD"sv);
-  result.tickSize(0.05);
-  result.multiplier(10.0);
-  result.minNotional(1.0);
-  result.minTradeVol(1.0);
-  result.maxTradeVol(999.0);
-  result.tradeVolStepSize(1.0);
-  result.optionType(roq_sbe::OptionType::Value::Call);
-  result.putStrikeCurrency("USD"sv);
-  result.strikePrice(123.4);
-  result.putUnderlying("BTC-INDEX"sv);
-  result.putTimeZone("GMT"sv);
-  result.issueDate(1234);
-  result.settlementDate(2345);
-  result.expiryDateTime(3456);
-  result.expiryDateTimeUTC(4567);
-
-  auto length = message_header_type::encodedLength() + mesage_type::computeLength();
-  CHECK(length == 538);  // see next test
-
-  std::span message{std::data(buffer), length};
-
-  fmt::print("{}\n"sv, roq::debug::hex::Message{message});
-}
-
-TEST_CASE("reference_data_decode", "[reference_data]") {
-  using mesage_type = roq_sbe::ReferenceData;
-  using message_header_type = roq_sbe::MessageHeader;
-
-  auto const message =
-      "\x12\x02"  // block length (530)
+  auto reference_data = ReferenceData{
+      .exchange = EXCHANGE,
+      .symbol = SYMBOL,
+      .description = DESCRIPTION,
+      .security_type = SecurityType::SWAP,
+      .base_currency = "BTC"sv,
+      .quote_currency = "USD"sv,
+      .margin_currency = "USD"sv,
+      .commission_currency = "USD"sv,
+      .tick_size = 0.05,
+      .multiplier = 10.0,
+      .min_notional = 1.0,
+      .min_trade_vol = 1.0,
+      .max_trade_vol = 999.0,
+      .trade_vol_step_size = 1.0,
+      .option_type = OptionType::CALL,
+      .strike_currency = "USD"sv,
+      .strike_price = 123.4,
+      .underlying = "BTC-INDEX"sv,
+      .time_zone = "GMT"sv,
+      .issue_date = std::chrono::days{1234},
+      .settlement_date = std::chrono::days{2345},
+      .expiry_datetime = 3456s,
+      .expiry_datetime_utc = 4567s,
+  };
+  auto message_1 = sbe::codec::Encoder::encode(buffer, reference_data);
+  fmt::print("{}\n"sv, roq::debug::hex::Message{message_1});
+  REQUIRE(std::size(message_1) == 530);
+  std::string_view text_1{reinterpret_cast<char const *>(std::data(message_1)), std::size(message_1)};
+  auto const text_2 =
+      "\x0a\x02"  // block length (522)
       "\x0a\x00"  // template id (10)
       "\x01\x00"  // schema id (1)
       "\x01\x00"  // version (1)
@@ -98,41 +95,48 @@ TEST_CASE("reference_data_decode", "[reference_data]") {
       "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"  // time zone
       "\xd2\x04\x00\x00"                                  // issue date
       "\x29\x09\x00\x00"                                  // settlement date
-      "\x80\x0d\x00\x00\x00\x00\x00\x00"                  // expiry datetime
-      "\xd7\x11\x00\x00\x00\x00\x00\x00"sv;               // expiry datetime utc
-  REQUIRE(std::size(message) == 538);
+      "\x80\x0d\x00\x00"                                  // expiry datetime
+      "\xd7\x11\x00\x00"sv;                               // expiry datatime utc
+  REQUIRE(std::size(text_2) == 530);
+  CHECK(text_1 == text_2);
+  std::span message_2{reinterpret_cast<std::byte const *>(std::data(text_2)), std::size(text_2)};
 
-  std::span payload{reinterpret_cast<std::byte const *>(std::data(message)), std::size(message)};
+  struct Handler final : public sbe::codec::Decoder::Handler {
+    explicit Handler(ReferenceData const &source) : source_{source} {}
+    void operator()(ReferenceData const &reference_data) {
+      found = true;
+      CHECK(reference_data.exchange == source_.exchange);
+      CHECK(reference_data.symbol == source_.symbol);
+      CHECK(reference_data.description == source_.description);
+      CHECK(reference_data.security_type == source_.security_type);
+      CHECK(reference_data.base_currency == source_.base_currency);
+      CHECK(reference_data.quote_currency == source_.quote_currency);
+      CHECK(reference_data.margin_currency == source_.margin_currency);
+      CHECK(reference_data.commission_currency == source_.commission_currency);
+      CHECK(reference_data.tick_size == source_.tick_size);
+      CHECK(reference_data.multiplier == source_.multiplier);
+      CHECK(reference_data.min_notional == source_.min_notional);
+      CHECK(reference_data.min_trade_vol == source_.min_trade_vol);
+      CHECK(reference_data.max_trade_vol == source_.max_trade_vol);
+      CHECK(reference_data.trade_vol_step_size == source_.trade_vol_step_size);
+      CHECK(reference_data.option_type == source_.option_type);
+      CHECK(reference_data.strike_currency == source_.strike_currency);
+      CHECK(reference_data.strike_price == source_.strike_price);
+      CHECK(reference_data.underlying == source_.underlying);
+      CHECK(reference_data.time_zone == source_.time_zone);
+      CHECK(reference_data.issue_date == source_.issue_date);
+      CHECK(reference_data.settlement_date == source_.settlement_date);
+      CHECK(reference_data.expiry_datetime == source_.expiry_datetime);
+      CHECK(reference_data.expiry_datetime_utc == source_.expiry_datetime_utc);
+    }
+    void operator()(MarketStatus const &) { FAIL(); }
+    void operator()(TopOfBook const &) { FAIL(); }
+    bool found = false;
 
-  // note! SBE is *not* const-safe
-
-  // - message header
-  message_header_type message_header{
-      reinterpret_cast<char *>(const_cast<std::byte *>(std::data(payload))), std::size(payload)};
-  auto message_header_length = message_header_type::encodedLength();
-  CHECK(message_header_length == 8);
-  auto block_length = message_header.blockLength();
-  CHECK(block_length == 530);
-  auto template_id = message_header.templateId();
-  REQUIRE(template_id == 10);
-  auto schema_id = message_header.schemaId();
-  CHECK(schema_id == 1);
-  auto version = message_header.version();
-  CHECK(version == 1);
-
-  // - message
-  auto payload_2 = payload.subspan(message_header_length);
-  mesage_type value{
-      reinterpret_cast<char *>(const_cast<std::byte *>(std::data(payload_2))),
-      std::size(payload_2),
-      block_length,
-      version};
-  auto message_length = value.computeLength();
-  CHECK(message_length == 530);
-  CHECK((message_header_length + message_length) == std::size(message));
-  value.sbeRewind();  // note! here it's not needed -- but with variable lists, it seems to be
-  auto exchange = value.getExchangeAsStringView();
-  CHECK(exchange == "deribit"sv);
-  auto symbol = value.getSymbolAsStringView();
-  CHECK(symbol == "BTC-PERPETUAL"sv);
+   private:
+    ReferenceData const &source_;
+  } handler{reference_data};
+  auto bytes = sbe::codec::Decoder::decode(handler, message_2);
+  CHECK(handler.found == true);
+  CHECK(bytes == std::size(message_1));
 }
