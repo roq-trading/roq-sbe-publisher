@@ -5,7 +5,7 @@
 #include "roq/flags/args.hpp"
 #include "roq/logging/flags/settings.hpp"
 
-#include "roq/sbe/multicast/subscriber/application.hpp"
+#include "roq/sbe/publisher/application.hpp"
 
 using namespace std::literals;
 
@@ -13,7 +13,7 @@ using namespace std::literals;
 
 namespace {
 auto const INFO = roq::Service::Info{
-    .description = "Subscriber"sv,
+    .description = "SBE Publisher"sv,
     .package_name = ROQ_PACKAGE_NAME,
     .build_version = ROQ_VERSION,
 };
@@ -24,5 +24,5 @@ auto const INFO = roq::Service::Info{
 int main(int argc, char **argv) {
   roq::flags::Args args{argc, argv, INFO.description, INFO.build_version};
   roq::logging::flags::Settings settings{args};
-  return roq::sbe::multicast::subscriber::Application{args, settings, INFO}.run();
+  return roq::sbe::publisher::Application{args, settings, INFO}.run();
 }

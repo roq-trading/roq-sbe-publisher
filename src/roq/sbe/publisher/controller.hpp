@@ -10,12 +10,11 @@
 
 #include "roq/io/net/udp/sender.hpp"
 
-#include "roq/sbe/multicast/publisher/config.hpp"
-#include "roq/sbe/multicast/publisher/settings.hpp"
+#include "roq/sbe/publisher/config.hpp"
+#include "roq/sbe/publisher/settings.hpp"
 
 namespace roq {
 namespace sbe {
-namespace multicast {
 namespace publisher {
 
 struct Controller final : public client::Handler, public io::sys::Timer::Handler, public io::net::udp::Sender::Handler {
@@ -55,6 +54,5 @@ struct Controller final : public client::Handler, public io::sys::Timer::Handler
 };
 
 }  // namespace publisher
-}  // namespace multicast
 }  // namespace sbe
 }  // namespace roq

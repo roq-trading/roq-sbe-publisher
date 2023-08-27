@@ -4,11 +4,10 @@
 
 #include "roq/client/config.hpp"
 
-#include "roq/sbe/multicast/publisher/settings.hpp"
+#include "roq/sbe/publisher/settings.hpp"
 
 namespace roq {
 namespace sbe {
-namespace multicast {
 namespace publisher {
 
 struct Config final : public client::Config {
@@ -22,6 +21,5 @@ struct Config final : public client::Config {
 };
 
 }  // namespace publisher
-}  // namespace multicast
 }  // namespace sbe
 }  // namespace roq

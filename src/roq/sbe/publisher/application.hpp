@@ -7,11 +7,10 @@
 
 #include "roq/service.hpp"
 
-#include "roq/sbe/multicast/publisher/controller.hpp"
+#include "roq/sbe/publisher/controller.hpp"
 
 namespace roq {
 namespace sbe {
-namespace multicast {
 namespace publisher {
 
 struct Application final : public Service {
@@ -25,6 +24,5 @@ struct Application final : public Service {
 };
 
 }  // namespace publisher
-}  // namespace multicast
 }  // namespace sbe
 }  // namespace roq

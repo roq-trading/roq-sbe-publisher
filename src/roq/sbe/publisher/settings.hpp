@@ -10,11 +10,10 @@
 
 #include "roq/client/flags/settings.hpp"
 
-#include "roq/sbe/multicast/publisher/flags/flags.hpp"
+#include "roq/sbe/publisher/flags/flags.hpp"
 
 namespace roq {
 namespace sbe {
-namespace multicast {
 namespace publisher {
 
 struct Settings final : public client::flags::Settings, public flags::Flags {
@@ -22,18 +21,17 @@ struct Settings final : public client::flags::Settings, public flags::Flags {
 };
 
 }  // namespace publisher
-}  // namespace multicast
 }  // namespace sbe
 }  // namespace roq
 
 template <>
-struct fmt::formatter<roq::sbe::multicast::publisher::Settings> {
+struct fmt::formatter<roq::sbe::publisher::Settings> {
   template <typename Context>
   constexpr auto parse(Context &context) {
     return std::begin(context);
   }
   template <typename Context>
-  auto format(roq::sbe::multicast::publisher::Settings const &value, Context &context) const {
+  auto format(roq::sbe::publisher::Settings const &value, Context &context) const {
     using namespace fmt::literals;
     return fmt::format_to(
         context.out(),
@@ -42,6 +40,6 @@ struct fmt::formatter<roq::sbe::multicast::publisher::Settings> {
         R"(flags={})"
         R"(}})"_cf,
         static_cast<roq::client::Settings2 const &>(value),
-        static_cast<roq::sbe::multicast::publisher::flags::Flags const &>(value));
+        static_cast<roq::sbe::publisher::flags::Flags const &>(value));
   }
 };

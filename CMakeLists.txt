@@ -75,7 +75,7 @@ include_directories(
 
 # sub-projects
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/roq)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/roq/sbe/publisher)
 
 # test
 

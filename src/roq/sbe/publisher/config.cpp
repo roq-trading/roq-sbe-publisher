@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2023, Hans Erik Thrane */
 
-#include "roq/sbe/multicast/publisher/config.hpp"
+#include "roq/sbe/publisher/config.hpp"
 
 #include "roq/logging.hpp"
 
@@ -8,7 +8,6 @@ using namespace std::literals;
 
 namespace roq {
 namespace sbe {
-namespace multicast {
 namespace publisher {
 
 // === IMPLEMENTATION ===
@@ -25,6 +24,5 @@ void Config::dispatch(Handler &handler) const {
 }
 
 }  // namespace publisher
-}  // namespace multicast
 }  // namespace sbe
 }  // namespace roq

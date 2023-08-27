@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2023, Hans Erik Thrane */
 
-#include "roq/sbe/multicast/publisher/controller.hpp"
+#include "roq/sbe/publisher/controller.hpp"
 
 #include <absl/base/internal/endian.h>
 
@@ -14,7 +14,6 @@ using namespace std::literals;
 
 namespace roq {
 namespace sbe {
-namespace multicast {
 namespace publisher {
 
 // === CONSTANTS ===
@@ -115,6 +114,5 @@ void Controller::send(std::span<std::byte const> const &payload) {
 }
 
 }  // namespace publisher
-}  // namespace multicast
 }  // namespace sbe
 }  // namespace roq

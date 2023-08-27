@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2023, Hans Erik Thrane */
 
-#include "roq/sbe/multicast/publisher/application.hpp"
+#include "roq/sbe/publisher/application.hpp"
 
 #include <cassert>
 
@@ -8,14 +8,13 @@
 
 #include "roq/io/engine/context_factory.hpp"
 
-#include "roq/sbe/multicast/publisher/config.hpp"
-#include "roq/sbe/multicast/publisher/settings.hpp"
+#include "roq/sbe/publisher/config.hpp"
+#include "roq/sbe/publisher/settings.hpp"
 
 using namespace std::literals;
 
 namespace roq {
 namespace sbe {
-namespace multicast {
 namespace publisher {
 
 // === IMPLEMENTATION ===
@@ -33,6 +32,5 @@ int Application::main(args::Parser const &args) {
 }
 
 }  // namespace publisher
-}  // namespace multicast
 }  // namespace sbe
 }  // namespace roq

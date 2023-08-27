@@ -1,4 +1,4 @@
-set(TARGET_NAME ${PROJECT_NAME}-publisher-flags)
+set(TARGET_NAME ${PROJECT_NAME}-flags)
 
 include(RoqAutogen)
 
@@ -8,7 +8,7 @@ roq_autogen(
   OUTPUT
   AUTOGEN_HEADERS
   NAMESPACE
-  "roq/sbe/multicast/publisher/flags"
+  "roq/sbe/publisher/flags"
   OUTPUT_TYPE
   "state"
   FILE_TYPE
@@ -22,7 +22,7 @@ roq_autogen(
   OUTPUT
   AUTOGEN_SOURCES
   NAMESPACE
-  "roq/sbe/multicast/publisher/flags"
+  "roq/sbe/publisher/flags"
   OUTPUT_TYPE
   "state"
   FILE_TYPE
