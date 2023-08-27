@@ -84,6 +84,8 @@ void Controller::operator()(Event<Ready> const &) {
 
 void Controller::operator()(Event<ReferenceData> const &event) {
   auto &[message_info, reference_data] = event;
+  if (reference_data.discard)
+    return;
   auto message = codec::Encoder::encode(buffer_, reference_data);
   send(message);
 }
