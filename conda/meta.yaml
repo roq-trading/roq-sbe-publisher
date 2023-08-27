@@ -30,6 +30,7 @@ requirements:
     - roq-io
     - roq-oss-benchmark
     - roq-oss-catch2  # [osx]
+    - roq-oss-tomlplusplus
     - roq-sbe
 
 about:
