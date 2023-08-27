@@ -1,6 +1,6 @@
 set(TARGET_NAME ${PROJECT_NAME}-test)
 
-set(SOURCES market_status.cpp top_of_book.cpp main.cpp)
+set(SOURCES market_status.cpp reference_data.cpp top_of_book.cpp main.cpp)
 
 roq_gitignore(OUTPUT .gitignore SOURCES ${TARGET_NAME})
 
