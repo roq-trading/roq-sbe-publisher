@@ -8,7 +8,7 @@
 
 #include "roq/logging.hpp"
 
-#include "roq/json/top_of_book.hpp"
+#include "roq/sbe/codec/encoder.hpp"
 
 using namespace std::literals;
 
@@ -20,7 +20,8 @@ namespace publisher {
 
 namespace {
 auto const TIMER_FREQUENCY = 1s;
-}
+auto const MAX_BUFFER_SIZE = size_t{2048};
+}  // namespace
 
 // === HELPERS ===
 
@@ -55,7 +56,8 @@ Controller::Controller(client::Dispatcher &dispatcher, Settings const &settings,
       snapshot_{create_sender(
           *this, context_, settings, settings.multicast_address_snapshot, settings.multicast_port_snapshot)},
       incremental_{create_sender(
-          *this, context_, settings, settings.multicast_address_incremental, settings.multicast_port_incremental)} {
+          *this, context_, settings, settings.multicast_address_incremental, settings.multicast_port_incremental)},
+      buffer_(MAX_BUFFER_SIZE) {
   (*timer_).resume();
 }
 
@@ -80,20 +82,22 @@ void Controller::operator()(Event<DownloadEnd> const &) {
 void Controller::operator()(Event<Ready> const &) {
 }
 
-void Controller::operator()(Event<ReferenceData> const &) {
+void Controller::operator()(Event<ReferenceData> const &event) {
+  auto &[message_info, reference_data] = event;
+  auto message = codec::Encoder::encode(buffer_, reference_data);
+  send(message);
+}
+
+void Controller::operator()(Event<MarketStatus> const &event) {
+  auto &[message_info, market_status] = event;
+  auto message = codec::Encoder::encode(buffer_, market_status);
+  send(message);
 }
 
 void Controller::operator()(Event<TopOfBook> const &event) {
   auto &[message_info, top_of_book] = event;
-  // XXX TODO SBE encoding
-  auto context = json::Context{
-      .price_decimals = {},
-      .quantity_decimals = {},
-  };
-  auto message = fmt::format("{}"sv, json::TopOfBook(context, top_of_book));
-  log::info(R"(message="{}")"sv, message);
-  std::span payload{reinterpret_cast<std::byte const *>(std::data(message)), std::size(message)};
-  send(payload);
+  auto message = codec::Encoder::encode(buffer_, top_of_book);
+  send(message);
 }
 
 // io::sys::Timer::Handler

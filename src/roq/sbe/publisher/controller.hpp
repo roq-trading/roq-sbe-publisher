@@ -32,6 +32,7 @@ struct Controller final : public client::Handler, public io::sys::Timer::Handler
   void operator()(Event<DownloadEnd> const &) override;
   void operator()(Event<Ready> const &) override;
   void operator()(Event<ReferenceData> const &) override;
+  void operator()(Event<MarketStatus> const &) override;
   void operator()(Event<TopOfBook> const &) override;
 
   // io::sys::Timer::Handler
@@ -50,6 +51,7 @@ struct Controller final : public client::Handler, public io::sys::Timer::Handler
   std::unique_ptr<io::sys::Timer> timer_;
   std::unique_ptr<io::Sender> snapshot_;
   std::unique_ptr<io::Sender> incremental_;
+  std::vector<std::byte> buffer_;
   // EXPERIMENTAL
   uint32_t sequence_number_ = {};
 };
