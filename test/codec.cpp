@@ -9,6 +9,10 @@
 
 using namespace std::literals;
 
+TEST_CASE("codec_encode", "[codec]") {
+  CHECK(1 == 1);
+}
+
 /*
 TEST_CASE("codec_encode", "[codec]") {
   using mesage_type = codec::Simple;

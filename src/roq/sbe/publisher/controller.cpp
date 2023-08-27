@@ -29,12 +29,12 @@ auto create_timer(auto &handler, auto &context) {
   return context.create_timer(handler, TIMER_FREQUENCY);
 }
 
-auto create_sender(auto &handler, auto &context, auto &settings) {
-  if (std::empty(settings.multicast_address))
+auto create_sender(auto &handler, auto &context, auto &settings, auto &multicast_address, auto &multicast_port) {
+  if (std::empty(multicast_address))
     log::fatal("Unexpected: address is missing"sv);
-  if (!settings.multicast_port)
+  if (!multicast_port)
     log::fatal("Unexpected: port is missing"sv);
-  auto network_address = io::NetworkAddress::create_blocking(settings.multicast_address, settings.multicast_port);
+  auto network_address = io::NetworkAddress::create_blocking(multicast_address, multicast_port);
   auto socket_options = Mask{
       io::SocketOption::REUSE_ADDRESS,
   };
@@ -52,7 +52,10 @@ auto create_sender(auto &handler, auto &context, auto &settings) {
 
 Controller::Controller(client::Dispatcher &dispatcher, Settings const &settings, Config const &, io::Context &context)
     : dispatcher_{dispatcher}, context_{context}, timer_{create_timer(*this, context_)},
-      sender_{create_sender(*this, context_, settings)} {
+      snapshot_{create_sender(
+          *this, context_, settings, settings.multicast_address_snapshot, settings.multicast_port_snapshot)},
+      incremental_{create_sender(
+          *this, context_, settings, settings.multicast_address_incremental, settings.multicast_port_incremental)} {
   (*timer_).resume();
 }
 
@@ -110,7 +113,7 @@ void Controller::send(std::span<std::byte const> const &payload) {
   auto sequence_number = absl::little_endian::FromHost(++sequence_number_);
   std::span header{reinterpret_cast<std::byte const *>(&sequence_number), sizeof(sequence_number)};
   std::array<std::span<std::byte const>, 2> message{{header, payload}};
-  (*sender_).send(message);
+  (*incremental_).send(message);
 }
 
 }  // namespace publisher

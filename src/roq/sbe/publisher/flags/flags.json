@@ -18,12 +18,22 @@
       "description": "UDP publish address"
     },
     {
-      "name": "multicast_address",
+      "name": "multicast_address_snapshot",
       "type": "std::string",
       "description": "UDP publish address"
     },
     {
-      "name": "multicast_port",
+      "name": "multicast_port_snapshot",
+      "type": "uint16_t",
+      "description": "UDP publish port"
+    },
+    {
+      "name": "multicast_address_incremental",
+      "type": "std::string",
+      "description": "UDP publish address"
+    },
+    {
+      "name": "multicast_port_incremental",
       "type": "uint16_t",
       "description": "UDP publish port"
     },

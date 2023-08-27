@@ -48,7 +48,8 @@ struct Controller final : public client::Handler, public io::sys::Timer::Handler
   client::Dispatcher &dispatcher_;
   io::Context &context_;
   std::unique_ptr<io::sys::Timer> timer_;
-  std::unique_ptr<io::Sender> sender_;
+  std::unique_ptr<io::Sender> snapshot_;
+  std::unique_ptr<io::Sender> incremental_;
   // EXPERIMENTAL
   uint32_t sequence_number_ = {};
 };
