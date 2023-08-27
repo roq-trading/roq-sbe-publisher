@@ -17,13 +17,15 @@ else
   PREFIX=
 fi
 
-$PREFIX "./roq-sbe-multicast-test-publisher" \
+$PREFIX "./roq-sbe-publisher" \
   --name "$NAME" \
   --exchange "deribit" \
   --symbols ".*" \
   --local_interface 192.168.188.64 \
-  --multicast_address 224.1.1.1 \
-  --multicast_port 6789 \
+  --multicast_address_snapshot 224.1.1.1 \
+  --multicast_port_snapshot 6789 \
+  --multicast_address_incremental 224.1.1.2 \
+  --multicast_port_incremental 5678 \
   --multicast_ttl 4 \
   --multicast_loop=true \
   $@
