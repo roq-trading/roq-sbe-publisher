@@ -25,6 +25,7 @@ requirements:
     - abseil-cpp
     - catch2  # [linux]
     - roq-client
+    - roq-core
     - roq-flags
     - roq-io
     - roq-oss-benchmark
