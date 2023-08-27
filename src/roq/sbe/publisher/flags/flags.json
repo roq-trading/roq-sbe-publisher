@@ -3,14 +3,11 @@
   "type": "flags",
   "values": [
     {
-      "name": "symbols",
+      "name": "config_file",
       "type": "std::string",
-      "description": "symbols"
-    },
-    {
-      "name": "exchange",
-      "type": "std::string",
-      "description": "exchange"
+      "validator": "roq::flags::validators::Path",
+      "required": true,
+      "description": "config file (path)"
     },
     {
       "name": "local_interface",

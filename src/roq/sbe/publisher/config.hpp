@@ -2,22 +2,25 @@
 
 #pragma once
 
-#include "roq/client/config.hpp"
+#include <absl/container/flat_hash_set.h>
 
-#include "roq/sbe/publisher/settings.hpp"
+#include "roq/client/config.hpp"
 
 namespace roq {
 namespace sbe {
 namespace publisher {
 
 struct Config final : public client::Config {
-  explicit Config(Settings const &);
+  static Config parse_file(std::string_view const &);
+  static Config parse_text(std::string_view const &);
 
  protected:
   void dispatch(Handler &) const override;
 
  private:
-  Settings const &settings_;
+  explicit Config(auto &node);
+
+  absl::flat_hash_set<std::string> const symbols;
 };
 
 }  // namespace publisher

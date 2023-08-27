@@ -24,8 +24,7 @@ int Application::main(args::Parser const &args) {
   if (std::empty(params))
     log::fatal("Unexpected"sv);
   Settings settings{args};
-  settings.app.drop_copy = true;  // note!
-  Config config{settings};
+  auto config = Config::parse_file(settings.config_file);
   auto context = io::engine::ContextFactory::create_libevent();
   client::Bridge{settings, config, params}.dispatch<value_type>(settings, config, *context);
   return EXIT_SUCCESS;
