@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
 
 #include "roq/client/config.hpp"
@@ -20,7 +21,7 @@ struct Config final : public client::Config {
  private:
   explicit Config(auto &node);
 
-  absl::flat_hash_set<std::string> const symbols;
+  absl::flat_hash_map<std::string, absl::flat_hash_set<std::string>> const symbols_;
 };
 
 }  // namespace publisher

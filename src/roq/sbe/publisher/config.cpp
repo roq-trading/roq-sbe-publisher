@@ -45,20 +45,42 @@ bool find_and_remove(auto &node, std::string_view const &key, Callback callback)
 }
 
 template <typename R>
+void parse_symbols_helper(R &result, auto &node) {
+  assert(node.is_table());
+  for (auto &[key, item] : node) {
+    auto &symbols = result[key];
+    if (item.is_table()) {
+      auto table = *item.as_table();
+      for (auto &[key_2, item_2] : table) {
+        if (key_2 == "regex"sv) {
+          if (item_2.is_value()) {
+            symbols.emplace(*item_2.template value<std::string_view>());
+          } else if (item_2.is_array()) {
+            auto array = *item_2.as_array();
+            for (auto &item_3 : array)
+              symbols.emplace(*item_3.template value<std::string_view>());
+          } else {
+            log::fatal("Unexpected: regex must be value or array"sv);
+          }
+        } else {
+          log::fatal("Unexpected: regex"sv);
+        }
+      }
+    } else {
+      log::fatal("Unexpected: regex"sv);
+    }
+  }
+}
+
+template <typename R>
 R parse_symbols(auto &node) {
   using result_type = std::remove_cvref<R>::type;
   result_type result;
   auto parse_helper = [&](auto &node) {
-    using value_type = typename R::value_type;
-    if (node.is_value()) {
-      result.emplace(*node.template value<value_type>());
-    } else if (node.is_array()) {
-      auto &arr = *node.as_array();
-      for (auto &node_2 : arr) {
-        result.emplace(*node_2.template value<value_type>());
-      }
+    if (node.is_table()) {
+      parse_symbols_helper(result, *node.as_table());
     } else {
-      log::fatal("Unexpected"sv);
+      log::fatal("Unexpected: symbols must be list of exchanges against symbol regex"sv);
     }
   };
   if (find_and_remove(node, "symbols"sv, parse_helper)) {
@@ -71,18 +93,19 @@ R parse_symbols(auto &node) {
 
 // === IMPLEMENTATION ===
 
-Config::Config(auto &node) : symbols{parse_symbols<decltype(symbols)>(node)} {
+Config::Config(auto &node) : symbols_{parse_symbols<decltype(symbols_)>(node)} {
   check_empty(node);
 }
 
 void Config::dispatch(Handler &handler) const {
-  for (auto &item : symbols) {
-    auto symbol = client::Symbol{
-        .regex = item,
-        .exchange = ".*",
-    };
-    handler(symbol);
-  }
+  for (auto &[exchange, symbols] : symbols_)
+    for (auto &item : symbols) {
+      auto symbol = client::Symbol{
+          .regex = item,
+          .exchange = exchange,
+      };
+      handler(symbol);
+    }
 }
 
 Config Config::parse_file(std::string_view const &path) {

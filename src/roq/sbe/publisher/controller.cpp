@@ -8,6 +8,8 @@
 
 #include "roq/logging.hpp"
 
+#include "roq/debug/hex/message.hpp"
+
 #include "roq/sbe/codec/encoder.hpp"
 
 using namespace std::literals;
@@ -92,12 +94,14 @@ void Controller::operator()(Event<ReferenceData> const &event) {
 
 void Controller::operator()(Event<MarketStatus> const &event) {
   auto &[message_info, market_status] = event;
+  log::debug("market_status={}"sv, market_status);
   auto message = codec::Encoder::encode(buffer_, market_status);
   send(message);
 }
 
 void Controller::operator()(Event<TopOfBook> const &event) {
   auto &[message_info, top_of_book] = event;
+  log::debug("top_of_book={}"sv, top_of_book);
   auto message = codec::Encoder::encode(buffer_, top_of_book);
   send(message);
 }
@@ -117,6 +121,7 @@ void Controller::operator()(io::net::udp::Sender::Error const &) {
 
 void Controller::send(std::span<std::byte const> const &payload) {
   auto sequence_number = absl::little_endian::FromHost(++sequence_number_);
+  log::debug("[{}] {}"sv, sequence_number, debug::hex::Message{payload});
   std::span header{reinterpret_cast<std::byte const *>(&sequence_number), sizeof(sequence_number)};
   std::array<std::span<std::byte const>, 2> message{{header, payload}};
   (*incremental_).send(message);
