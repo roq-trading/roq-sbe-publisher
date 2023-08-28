@@ -1,5 +1,5 @@
 package:
-  name: roq-sbe
+  name: roq-sbe-publisher
   version: {{ GIT_DESCRIBE_TAG }}
 
 source:
@@ -12,7 +12,7 @@ build:
     - ROQ_BUILD_NUMBER                                                                                                  
     - ROQ_BUILD_TYPE                                                                                                    
   run_exports:                                                                                                          
-    - {{ pin_subpackage('roq-sbe', max_pin='x.x.x') }}
+    - {{ pin_subpackage('roq-sbe-publisher', max_pin='x.x.x') }}
 
 requirements:
   build:
@@ -40,4 +40,4 @@ about:
   license: Commercial
   license_family: PROPRIETARY
   license_file: LICENSE
-  summary: Roq SBE
+  summary: Roq SBE Publisher

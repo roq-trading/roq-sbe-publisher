@@ -11,7 +11,7 @@ include(GetGitRepoVersion)
 
 # project
 
-project(roq-sbe)
+project(roq-sbe-publisher)
 
 # conda
 
