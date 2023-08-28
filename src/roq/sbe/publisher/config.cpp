@@ -48,8 +48,13 @@ template <typename R>
 void parse_symbols_helper(R &result, auto &node) {
   assert(node.is_table());
   for (auto &[key, item] : node) {
-    auto &symbols = result[key];
-    if (item.is_table()) {
+    if (item.is_array()) {
+      auto &symbols = result[""sv];
+      auto array = *item.as_array();
+      for (auto &item : array)
+        symbols.emplace(*item.template value<std::string_view>());
+    } else if (item.is_table()) {
+      auto &symbols = result[key];
       auto table = *item.as_table();
       for (auto &[key_2, item_2] : table) {
         if (key_2 == "regex"sv) {
