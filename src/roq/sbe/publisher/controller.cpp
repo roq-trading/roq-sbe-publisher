@@ -88,6 +88,7 @@ void Controller::operator()(Event<ReferenceData> const &event) {
   auto &[message_info, reference_data] = event;
   if (reference_data.discard)
     return;
+  log::debug("reference_data={}"sv, reference_data);
   auto message = codec::Encoder::encode(buffer_, reference_data);
   send(message);
 }
@@ -124,7 +125,10 @@ void Controller::send(std::span<std::byte const> const &payload) {
   log::debug("[{}] {}"sv, sequence_number, debug::hex::Message{payload});
   std::span header{reinterpret_cast<std::byte const *>(&sequence_number), sizeof(sequence_number)};
   std::array<std::span<std::byte const>, 2> message{{header, payload}};
-  (*incremental_).send(message);
+  auto bytes = (*incremental_).send(message);
+  if (!bytes) {
+    log::warn("DROP sequence_number={}"sv, sequence_number_);
+  }
 }
 
 }  // namespace publisher
