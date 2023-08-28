@@ -1,4 +1,4 @@
-set(TARGET_NAME ${PROJECT_NAME})
+set(TARGET_NAME ${PROJECT_NAME}-publisher)
 
 add_subdirectory(flags)
 
@@ -11,7 +11,7 @@ add_dependencies(${TARGET_NAME} ${TARGET_NAME}-flags-autogen-headers)
 target_link_libraries(
   ${TARGET_NAME}
   PRIVATE ${TARGET_NAME}-flags
-          ${PROJECT_NAME}-codec
+          roq-codec-sbe::roq-codec-sbe
           roq-io::roq-io
           roq-client::roq-client
           roq-client::roq-client-flags

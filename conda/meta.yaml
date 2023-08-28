@@ -1,5 +1,5 @@
 package:
-  name: roq-sbe-publisher
+  name: roq-sbe
   version: {{ GIT_DESCRIBE_TAG }}
 
 source:
@@ -25,13 +25,13 @@ requirements:
     - abseil-cpp
     - catch2  # [linux]
     - roq-client
+    - roq-codec-sbe
     - roq-core
     - roq-flags
     - roq-io
     - roq-oss-benchmark
     - roq-oss-catch2  # [osx]
     - roq-oss-tomlplusplus
-    - roq-sbe
 
 about:
   home: https://roq-trading.com
@@ -40,4 +40,4 @@ about:
   license: Commercial
   license_family: PROPRIETARY
   license_file: LICENSE
-  summary: Roq SBE Publisher
+  summary: Roq SBE
