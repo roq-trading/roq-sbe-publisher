@@ -10,7 +10,7 @@
 
 #include "roq/debug/hex/message.hpp"
 
-#include "roq/codec/sbe/encoder.hpp"
+#include "roq/sbe/codec/encoder.hpp"
 
 using namespace std::literals;
 
@@ -88,21 +88,21 @@ void Controller::operator()(Event<ReferenceData> const &event) {
   auto &[message_info, reference_data] = event;
   if (reference_data.discard)
     return;
-  auto message = codec::sbe::Encoder::encode(buffer_, reference_data);
+  auto message = codec::Encoder::encode(buffer_, reference_data);
   send(message);
 }
 
 void Controller::operator()(Event<MarketStatus> const &event) {
   auto &[message_info, market_status] = event;
   log::debug("market_status={}"sv, market_status);
-  auto message = codec::sbe::Encoder::encode(buffer_, market_status);
+  auto message = codec::Encoder::encode(buffer_, market_status);
   send(message);
 }
 
 void Controller::operator()(Event<TopOfBook> const &event) {
   auto &[message_info, top_of_book] = event;
   log::debug("top_of_book={}"sv, top_of_book);
-  auto message = codec::sbe::Encoder::encode(buffer_, top_of_book);
+  auto message = codec::Encoder::encode(buffer_, top_of_book);
   send(message);
 }
 

@@ -12,7 +12,7 @@ build:
     - ROQ_BUILD_NUMBER                                                                                                  
     - ROQ_BUILD_TYPE                                                                                                    
   run_exports:                                                                                                          
-    - {{ pin_subpackage('roq-sbe-publisher', max_pin='x.x.x') }}
+    - {{ pin_subpackage('roq-sbe', max_pin='x.x.x') }}
 
 requirements:
   build:
@@ -25,13 +25,13 @@ requirements:
     - abseil-cpp
     - catch2  # [linux]
     - roq-client
-    - roq-codec-sbe
     - roq-core
     - roq-flags
     - roq-io
     - roq-oss-benchmark
     - roq-oss-catch2  # [osx]
     - roq-oss-tomlplusplus
+    - roq-sbe-codec
 
 about:
   home: https://roq-trading.com

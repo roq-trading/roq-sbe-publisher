@@ -11,7 +11,7 @@ add_dependencies(${TARGET_NAME} ${TARGET_NAME}-flags-autogen-headers)
 target_link_libraries(
   ${TARGET_NAME}
   PRIVATE ${TARGET_NAME}-flags
-          roq-codec-sbe::roq-codec-sbe
+          roq-sbe-codec::roq-sbe-codec
           roq-io::roq-io
           roq-client::roq-client
           roq-client::roq-client-flags
