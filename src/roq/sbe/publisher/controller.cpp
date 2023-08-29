@@ -67,6 +67,9 @@ Controller::Controller(client::Dispatcher &dispatcher, Settings const &settings,
       incremental_{create_sender(
           *this, context_, settings, settings.multicast_address_incremental, settings.multicast_port_incremental)},
       buffer_(settings.encode_buffer_size), session_id_{create_session_id()} {
+  log::info(
+      "session_id={}"sv,
+      debug::hex::Message{std::span{reinterpret_cast<std::byte const *>(&session_id_), sizeof(session_id_)}});
   (*timer_).resume();
 }
 
@@ -95,28 +98,24 @@ void Controller::operator()(Event<ReferenceData> const &event) {
   auto &[message_info, reference_data] = event;
   if (reference_data.discard)
     return;
-  log::debug("reference_data={}"sv, reference_data);
   auto message = codec::Encoder::encode(buffer_, reference_data);
   send(message);
 }
 
 void Controller::operator()(Event<MarketStatus> const &event) {
   auto &[message_info, market_status] = event;
-  log::debug("market_status={}"sv, market_status);
   auto message = codec::Encoder::encode(buffer_, market_status);
   send(message);
 }
 
 void Controller::operator()(Event<TopOfBook> const &event) {
   auto &[message_info, top_of_book] = event;
-  log::debug("top_of_book={}"sv, top_of_book);
   auto message = codec::Encoder::encode(buffer_, top_of_book);
   send(message);
 }
 
 void Controller::operator()(Event<MarketByPriceUpdate> const &event) {
   auto &[message_info, market_by_price_update] = event;
-  log::debug("market_by_price_update={}"sv, market_by_price_update);
   // XXX FIXME HACK !!!
   auto tmp = market_by_price_update;
   tmp.bids = {std::data(market_by_price_update.bids), std::min<size_t>(1024, std::size(market_by_price_update.bids))};
@@ -126,9 +125,8 @@ void Controller::operator()(Event<MarketByPriceUpdate> const &event) {
 }
 
 void Controller::operator()(Event<MarketByOrderUpdate> const &event) {
-  auto &[message_info, market_by_order_update] = event;
-  log::debug("market_by_order_update={}"sv, market_by_order_update);
   /*
+  auto &[message_info, market_by_order_update] = event;
   auto message = codec::Encoder::encode(buffer_, market_by_order_update);
   send(message);
   */
@@ -136,14 +134,12 @@ void Controller::operator()(Event<MarketByOrderUpdate> const &event) {
 
 void Controller::operator()(Event<TradeSummary> const &event) {
   auto &[message_info, trade_summary] = event;
-  log::debug("trade_summary={}"sv, trade_summary);
   auto message = codec::Encoder::encode(buffer_, trade_summary);
   send(message);
 }
 
 void Controller::operator()(Event<StatisticsUpdate> const &event) {
   auto &[message_info, statistics_update] = event;
-  log::debug("statistics_update={}"sv, statistics_update);
   auto message = codec::Encoder::encode(buffer_, statistics_update);
   send(message);
 }
@@ -180,7 +176,7 @@ void Controller::send(std::span<std::byte const> const &payload) {
         .fragment_max = static_cast<uint8_t>(fragment_number_max),
     };
     static_assert(sizeof(Header) == 8);
-    log::debug(
+    log::info<1>(
         "[{}:{}:{}] {}"sv, sequence_number_, header.fragment, header.fragment_max, debug::hex::Message{payload_2});
     std::span header_2{reinterpret_cast<std::byte const *>(&header), sizeof(header)};
     std::array<std::span<std::byte const>, 2> message{{header_2, payload_2}};
