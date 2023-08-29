@@ -22,7 +22,8 @@ namespace publisher {
 
 namespace {
 auto const TIMER_FREQUENCY = 1s;
-auto const MAX_BUFFER_SIZE = size_t{2048};
+// auto const MAX_BUFFER_SIZE = size_t{2048};
+auto const MAX_BUFFER_SIZE = size_t{1024 * 1024};
 }  // namespace
 
 // === HELPERS ===
@@ -107,6 +108,40 @@ void Controller::operator()(Event<TopOfBook> const &event) {
   send(message);
 }
 
+void Controller::operator()(Event<MarketByPriceUpdate> const &event) {
+  auto &[message_info, market_by_price_update] = event;
+  log::debug("market_by_price_update={}"sv, market_by_price_update);
+  // XXX FIXME HACK !!!
+  auto tmp = market_by_price_update;
+  tmp.bids = {std::data(market_by_price_update.bids), std::min<size_t>(1024, std::size(market_by_price_update.bids))};
+  tmp.asks = {std::data(market_by_price_update.asks), std::min<size_t>(1024, std::size(market_by_price_update.asks))};
+  auto message = codec::Encoder::encode(buffer_, tmp);
+  send(message);
+}
+
+void Controller::operator()(Event<MarketByOrderUpdate> const &event) {
+  auto &[message_info, market_by_order_update] = event;
+  log::debug("market_by_order_update={}"sv, market_by_order_update);
+  /*
+  auto message = codec::Encoder::encode(buffer_, market_by_order_update);
+  send(message);
+  */
+}
+
+void Controller::operator()(Event<TradeSummary> const &event) {
+  auto &[message_info, trade_summary] = event;
+  log::debug("trade_summary={}"sv, trade_summary);
+  auto message = codec::Encoder::encode(buffer_, trade_summary);
+  send(message);
+}
+
+void Controller::operator()(Event<StatisticsUpdate> const &event) {
+  auto &[message_info, statistics_update] = event;
+  log::debug("statistics_update={}"sv, statistics_update);
+  auto message = codec::Encoder::encode(buffer_, statistics_update);
+  send(message);
+}
+
 // io::sys::Timer::Handler
 
 void Controller::operator()(io::sys::Timer::Event const &) {
@@ -125,9 +160,12 @@ void Controller::send(std::span<std::byte const> const &payload) {
   log::debug("[{}] {}"sv, sequence_number, debug::hex::Message{payload});
   std::span header{reinterpret_cast<std::byte const *>(&sequence_number), sizeof(sequence_number)};
   std::array<std::span<std::byte const>, 2> message{{header, payload}};
+  auto length = std::size(message[0]) + std::size(message[1]);
   auto bytes = (*incremental_).send(message);
   if (!bytes) {
-    log::warn("DROP sequence_number={}"sv, sequence_number_);
+    log::warn("DROP sequence_number={}, bytes={}, length={}"sv, sequence_number_, bytes, length);
+  } else if (bytes > 1400) {
+    log::warn("DROP sequence_number={}, bytes={}, length={} (message too large)"sv, sequence_number_, bytes, length);
   }
 }
 

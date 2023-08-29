@@ -34,6 +34,10 @@ struct Controller final : public client::Handler, public io::sys::Timer::Handler
   void operator()(Event<ReferenceData> const &) override;
   void operator()(Event<MarketStatus> const &) override;
   void operator()(Event<TopOfBook> const &) override;
+  void operator()(Event<MarketByPriceUpdate> const &) override;
+  void operator()(Event<MarketByOrderUpdate> const &) override;
+  void operator()(Event<TradeSummary> const &) override;
+  void operator()(Event<StatisticsUpdate> const &) override;
 
   // io::sys::Timer::Handler
   void operator()(io::sys::Timer::Event const &) override;
