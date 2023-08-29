@@ -56,7 +56,7 @@ struct Controller final : public client::Handler, public io::sys::Timer::Handler
   std::unique_ptr<io::Sender> snapshot_;
   std::unique_ptr<io::Sender> incremental_;
   std::vector<std::byte> buffer_;
-  // EXPERIMENTAL
+  uint16_t const session_id_ = {};
   uint32_t sequence_number_ = {};
 };
 
