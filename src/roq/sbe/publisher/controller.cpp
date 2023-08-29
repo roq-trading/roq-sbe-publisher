@@ -51,6 +51,11 @@ auto create_sender(auto &handler, auto &context, auto &settings, auto &multicast
       settings.multicast_ttl,
       settings.multicast_loop);
 }
+
+auto create_session_id() {
+  auto now_utc = clock::get_realtime<std::chrono::seconds>();
+  return static_cast<uint16_t>(now_utc.count());
+}
 }  // namespace
 
 // === IMPLEMENTATION ===
@@ -61,7 +66,7 @@ Controller::Controller(client::Dispatcher &dispatcher, Settings const &settings,
           *this, context_, settings, settings.multicast_address_snapshot, settings.multicast_port_snapshot)},
       incremental_{create_sender(
           *this, context_, settings, settings.multicast_address_incremental, settings.multicast_port_incremental)},
-      buffer_(settings.encode_buffer_size) {
+      buffer_(settings.encode_buffer_size), session_id_{create_session_id()} {
   (*timer_).resume();
 }
 
