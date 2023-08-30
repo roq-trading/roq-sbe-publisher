@@ -9,6 +9,7 @@
 #include "roq/sbe/publisher/config.hpp"
 #include "roq/sbe/publisher/incremental.hpp"
 #include "roq/sbe/publisher/settings.hpp"
+#include "roq/sbe/publisher/shared.hpp"
 #include "roq/sbe/publisher/snapshot.hpp"
 
 namespace roq {
@@ -43,6 +44,7 @@ struct Controller final : public client::Handler {
  private:
   client::Dispatcher &dispatcher_;
   io::Context &context_;
+  Shared shared_;
   Incremental incremental_;
   Snapshot snapshot_;
   bool ready_ = false;

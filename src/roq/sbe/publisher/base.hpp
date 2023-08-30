@@ -7,6 +7,7 @@
 #include "roq/io/net/udp/sender.hpp"
 
 #include "roq/sbe/publisher/settings.hpp"
+#include "roq/sbe/publisher/shared.hpp"
 
 namespace roq {
 namespace sbe {
@@ -17,7 +18,7 @@ struct Base : public io::net::udp::Sender::Handler {
   Base(Base const &) = delete;
 
  protected:
-  Base(Settings const &, io::Context &, std::string_view const &multicast_address, uint16_t multicast_port);
+  Base(Settings const &, io::Context &, Shared &, std::string_view const &multicast_address, uint16_t multicast_port);
 
   // io::net::udp::Sender::Handler
   void operator()(io::net::udp::Sender::Error const &) override;
@@ -29,7 +30,7 @@ struct Base : public io::net::udp::Sender::Handler {
   std::vector<std::byte> encode_buffer_;
 
  private:
-  uint16_t const session_id_ = {};
+  Shared const &shared_;
   std::unique_ptr<io::Sender> const sender_;
   uint32_t sequence_number_ = {};
 };

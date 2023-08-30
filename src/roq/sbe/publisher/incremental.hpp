@@ -8,13 +8,14 @@
 
 #include "roq/sbe/publisher/base.hpp"
 #include "roq/sbe/publisher/settings.hpp"
+#include "roq/sbe/publisher/shared.hpp"
 
 namespace roq {
 namespace sbe {
 namespace publisher {
 
 struct Incremental final : public Base {
-  Incremental(Settings const &, io::Context &context);
+  Incremental(Settings const &, io::Context &context, Shared &);
 
   void operator()(Event<Timer> const &);
   void operator()(Event<Connected> const &);

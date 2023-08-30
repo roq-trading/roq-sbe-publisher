@@ -10,6 +10,7 @@ set(SOURCES
     incremental.cpp
     instrument.cpp
     settings.cpp
+    shared.cpp
     snapshot.cpp
     main.cpp)
 

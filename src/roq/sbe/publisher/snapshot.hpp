@@ -11,13 +11,14 @@
 #include "roq/sbe/publisher/base.hpp"
 #include "roq/sbe/publisher/instrument.hpp"
 #include "roq/sbe/publisher/settings.hpp"
+#include "roq/sbe/publisher/shared.hpp"
 
 namespace roq {
 namespace sbe {
 namespace publisher {
 
 struct Snapshot final : public Base {
-  Snapshot(Settings const &, io::Context &context);
+  Snapshot(Settings const &, io::Context &context, Shared &);
 
   void operator()(Event<Timer> const &);
   void operator()(Event<Connected> const &);
@@ -38,8 +39,11 @@ struct Snapshot final : public Base {
   void publish(Instrument const &);
 
  private:
+  std::chrono::nanoseconds const publish_freq_;
   bool ready_ = false;
   absl::flat_hash_map<uint64_t, Instrument> instruments_;
+  std::deque<uint64_t> publish_;
+  std::chrono::nanoseconds next_publish_ = {};
 };
 
 }  // namespace publisher

@@ -14,8 +14,8 @@ namespace publisher {
 
 // === IMPLEMENTATION ===
 
-Incremental::Incremental(Settings const &settings, io::Context &context)
-    : Base{settings, context, settings.multicast_address_incremental, settings.multicast_port_incremental} {
+Incremental::Incremental(Settings const &settings, io::Context &context, Shared &shared)
+    : Base{settings, context, shared, settings.multicast_address_incremental, settings.multicast_port_incremental} {
 }
 
 void Incremental::operator()(Event<Timer> const &) {

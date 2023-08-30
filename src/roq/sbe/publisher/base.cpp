@@ -4,8 +4,6 @@
 
 #include <absl/base/internal/endian.h>
 
-#include "roq/clock.hpp"
-
 #include "roq/logging.hpp"
 
 #include "roq/utils/math.hpp"
@@ -27,11 +25,6 @@ constexpr auto const MAX_PAYLOAD_SIZE = size_t{1400};
 // === HELPERS ===
 
 namespace {
-auto create_session_id() {
-  auto now_utc = clock::get_realtime<std::chrono::seconds>();
-  return static_cast<uint16_t>(now_utc.count());
-}
-
 auto create_sender(auto &handler, auto &settings, auto &context, auto &multicast_address, auto multicast_port) {
   if (std::empty(multicast_address))
     log::fatal("Unexpected: address is missing"sv);
@@ -54,12 +47,13 @@ auto create_sender(auto &handler, auto &settings, auto &context, auto &multicast
 // === IMPLEMENTATION ===
 
 Base::Base(
-    Settings const &settings, io::Context &context, std::string_view const &multicast_address, uint16_t multicast_port)
-    : encode_buffer_(settings.encode_buffer_size), session_id_{create_session_id()},
+    Settings const &settings,
+    io::Context &context,
+    Shared &shared,
+    std::string_view const &multicast_address,
+    uint16_t multicast_port)
+    : encode_buffer_(settings.encode_buffer_size), shared_{shared},
       sender_{create_sender(*this, settings, context, multicast_address, multicast_port)} {
-  log::info(
-      "session_id={}"sv,
-      debug::hex::Message{std::span{reinterpret_cast<std::byte const *>(&session_id_), sizeof(session_id_)}});
 }
 
 // io::net::udp::Sender::Handler
@@ -83,7 +77,7 @@ void Base::send(std::span<std::byte const> const &payload) {
       uint8_t fragment;
       uint8_t fragment_max;
     } header{
-        .session_id = session_id_,  // note! random number => byte ordering not important
+        .session_id = shared_.session_id,  // note! random number => byte ordering not important
         .sequence_number = absl::little_endian::FromHost(++sequence_number_),
         .fragment = static_cast<uint8_t>(index),
         .fragment_max = static_cast<uint8_t>(fragment_number_max),

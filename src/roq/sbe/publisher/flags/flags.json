@@ -47,6 +47,13 @@
       "description": "UDP publish loop"
     },
     {
+      "name": "snapshot_publish_freq",
+      "type": "std::chrono::nanoseconds",
+      "validator": "roq::flags::validators::TimePeriod",
+      "default": "100ms",
+      "description": "snapshot publish frequency"
+    },
+    {
       "name": "encode_buffer_size",
       "type": "uint32_t",
       "default": 1048576,
