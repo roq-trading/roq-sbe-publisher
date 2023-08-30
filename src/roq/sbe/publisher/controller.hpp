@@ -6,18 +6,16 @@
 
 #include "roq/io/context.hpp"
 
-#include "roq/io/sys/timer.hpp"
-
-#include "roq/io/net/udp/sender.hpp"
-
 #include "roq/sbe/publisher/config.hpp"
+#include "roq/sbe/publisher/incremental.hpp"
 #include "roq/sbe/publisher/settings.hpp"
+#include "roq/sbe/publisher/snapshot.hpp"
 
 namespace roq {
 namespace sbe {
 namespace publisher {
 
-struct Controller final : public client::Handler, public io::sys::Timer::Handler, public io::net::udp::Sender::Handler {
+struct Controller final : public client::Handler {
   Controller(client::Dispatcher &, Settings const &, Config const &, io::Context &context);
 
   Controller(Controller &&) = default;
@@ -39,25 +37,15 @@ struct Controller final : public client::Handler, public io::sys::Timer::Handler
   void operator()(Event<TradeSummary> const &) override;
   void operator()(Event<StatisticsUpdate> const &) override;
 
-  // io::sys::Timer::Handler
-  void operator()(io::sys::Timer::Event const &) override;
-
-  // io::net::udp::Sender::Handler
-  void operator()(io::net::udp::Sender::Error const &) override;
-
-  // utilities
-
-  void send(std::span<std::byte const> const &payload);
+  template <typename T>
+  void dispatch(Event<T> const &, bool ready);
 
  private:
   client::Dispatcher &dispatcher_;
   io::Context &context_;
-  std::unique_ptr<io::sys::Timer> timer_;
-  std::unique_ptr<io::Sender> snapshot_;
-  std::unique_ptr<io::Sender> incremental_;
-  std::vector<std::byte> buffer_;
-  uint16_t const session_id_ = {};
-  uint32_t sequence_number_ = {};
+  Incremental incremental_;
+  Snapshot snapshot_;
+  bool ready_ = false;
 };
 
 }  // namespace publisher
