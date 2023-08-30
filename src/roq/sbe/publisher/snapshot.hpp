@@ -6,12 +6,10 @@
 
 #include "roq/api.hpp"
 
-#include "roq/cache/market_status.hpp"
-#include "roq/cache/reference_data.hpp"
-
 #include "roq/io/context.hpp"
 
 #include "roq/sbe/publisher/base.hpp"
+#include "roq/sbe/publisher/instrument.hpp"
 #include "roq/sbe/publisher/settings.hpp"
 
 namespace roq {
@@ -34,14 +32,14 @@ struct Snapshot final : public Base {
   void operator()(Event<StatisticsUpdate> const &);
 
  protected:
-  // publish
-  void operator()(cache::ReferenceData const &);
-  void operator()(cache::MarketStatus const &);
+  template <typename T>
+  void dispatch(Event<T> const &);
+
+  void publish(Instrument const &);
 
  private:
   bool ready_ = false;
-  absl::flat_hash_map<uint64_t, cache::ReferenceData> reference_data_;
-  absl::flat_hash_map<uint64_t, cache::MarketStatus> market_status_;
+  absl::flat_hash_map<uint64_t, Instrument> instruments_;
 };
 
 }  // namespace publisher

@@ -29,7 +29,7 @@ void Snapshot::operator()(Event<Connected> const &) {
 
 void Snapshot::operator()(Event<Disconnected> const &) {
   ready_ = false;
-  reference_data_.clear();
+  instruments_.clear();
 }
 
 void Snapshot::operator()(Event<Ready> const &) {
@@ -40,16 +40,11 @@ void Snapshot::operator()(Event<ReferenceData> const &event) {
   auto &[message_info, reference_data] = event;
   if (reference_data.discard)
     return;
-  if (reference_data_[message_info.opaque](reference_data)) {
-    // updated
-  }
+  dispatch(event);
 }
 
 void Snapshot::operator()(Event<MarketStatus> const &event) {
-  auto &[message_info, market_status] = event;
-  if (market_status_[message_info.opaque](market_status)) {
-    // updated
-  }
+  dispatch(event);
 }
 
 void Snapshot::operator()(Event<TopOfBook> const &) {
@@ -67,26 +62,24 @@ void Snapshot::operator()(Event<TradeSummary> const &) {
 void Snapshot::operator()(Event<StatisticsUpdate> const &) {
 }
 
-// publish
+// utilities
 
-void Snapshot::operator()(cache::ReferenceData const &cache) {
-  struct Context final {  // XXX FIXME
-    std::string exchange;
-    std::string symbol;
-  } context;
-  auto reference_data = cache.convert(context);
-  auto message = codec::Encoder::encode(encode_buffer_, reference_data);
-  send(message);
+template <typename T>
+void Snapshot::dispatch(Event<T> const &event) {
+  auto instrument_id = event.message_info.opaque;
+  auto iter = instruments_.find(instrument_id);
+  if (iter == std::end(instruments_))
+    iter = instruments_.try_emplace(instrument_id, event.value.exchange, event.value.symbol).first;
+  (*iter).second(event);
 }
 
-void Snapshot::operator()(cache::MarketStatus const &cache) {
-  struct Context final {  // XXX FIXME
-    std::string exchange;
-    std::string symbol;
-  } context;
-  auto market_status = cache.convert(context);
-  auto message = codec::Encoder::encode(encode_buffer_, market_status);
-  send(message);
+void Snapshot::publish(Instrument const &instrument) {
+  auto reference_data = instrument.reference_data.convert(instrument);
+  auto message_1 = codec::Encoder::encode(encode_buffer_, reference_data);
+  send(message_1);
+  auto market_status = instrument.market_status.convert(instrument);
+  auto message_2 = codec::Encoder::encode(encode_buffer_, market_status);
+  send(message_2);
 }
 
 }  // namespace publisher

@@ -8,6 +8,7 @@ set(SOURCES
     config.cpp
     controller.cpp
     incremental.cpp
+    instrument.cpp
     settings.cpp
     snapshot.cpp
     main.cpp)
