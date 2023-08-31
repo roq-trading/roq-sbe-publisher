@@ -34,24 +34,21 @@ void Incremental::operator()(Event<Ready> const &) {
 
 void Incremental::operator()(Event<ReferenceData> const &event) {
   assert(ready_);
-  auto &[message_info, reference_data] = event;
-  if (reference_data.discard)
+  if (event.value.discard)
     return;
-  auto message = codec::Encoder::encode(encode_buffer_, reference_data);
+  auto message = codec::Encoder::encode(encode_buffer_, event);
   send(message);
 }
 
 void Incremental::operator()(Event<MarketStatus> const &event) {
   assert(ready_);
-  auto &[message_info, market_status] = event;
-  auto message = codec::Encoder::encode(encode_buffer_, market_status);
+  auto message = codec::Encoder::encode(encode_buffer_, event);
   send(message);
 }
 
 void Incremental::operator()(Event<TopOfBook> const &event) {
   assert(ready_);
-  auto &[message_info, top_of_book] = event;
-  auto message = codec::Encoder::encode(encode_buffer_, top_of_book);
+  auto message = codec::Encoder::encode(encode_buffer_, event);
   send(message);
 }
 
@@ -62,7 +59,8 @@ void Incremental::operator()(Event<MarketByPriceUpdate> const &event) {
   auto tmp = market_by_price_update;
   tmp.bids = {std::data(market_by_price_update.bids), std::min<size_t>(1024, std::size(market_by_price_update.bids))};
   tmp.asks = {std::data(market_by_price_update.asks), std::min<size_t>(1024, std::size(market_by_price_update.asks))};
-  auto message = codec::Encoder::encode(encode_buffer_, tmp);
+  Event event_2{message_info, tmp};
+  auto message = codec::Encoder::encode(encode_buffer_, event_2);
   send(message);
 }
 
@@ -77,15 +75,13 @@ void Incremental::operator()(Event<MarketByOrderUpdate> const &event) {
 
 void Incremental::operator()(Event<TradeSummary> const &event) {
   assert(ready_);
-  auto &[message_info, trade_summary] = event;
-  auto message = codec::Encoder::encode(encode_buffer_, trade_summary);
+  auto message = codec::Encoder::encode(encode_buffer_, event);
   send(message);
 }
 
 void Incremental::operator()(Event<StatisticsUpdate> const &event) {
   assert(ready_);
-  auto &[message_info, statistics_update] = event;
-  auto message = codec::Encoder::encode(encode_buffer_, statistics_update);
+  auto message = codec::Encoder::encode(encode_buffer_, event);
   send(message);
 }
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <cstdint>
+#include "roq/api.hpp"
 
 namespace roq {
 namespace sbe {
@@ -12,6 +12,10 @@ struct Shared final {
   Shared();
 
   uint16_t const session_id;
+
+  Source source_name;
+  UUID source_session_id = {};
+  uint64_t source_seqno = {};
 };
 
 }  // namespace publisher

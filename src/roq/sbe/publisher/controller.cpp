@@ -25,11 +25,15 @@ void Controller::operator()(Event<Timer> const &event) {
 }
 
 void Controller::operator()(Event<Connected> const &event) {
+  shared_.source_name = event.message_info.source_name;
+  shared_.source_session_id = event.message_info.source_session_id;
   dispatch(event, true);
 }
 
 void Controller::operator()(Event<Disconnected> const &event) {
   ready_ = false;
+  shared_.source_name.clear();
+  shared_.source_session_id = {};
   dispatch(event, true);
 }
 
@@ -76,6 +80,7 @@ void Controller::operator()(Event<StatisticsUpdate> const &event) {
 
 template <typename T>
 void Controller::dispatch(Event<T> const &event, bool ready) {
+  shared_.source_seqno = event.message_info.source_seqno;
   if (ready)
     incremental_(event);
   snapshot_(event);

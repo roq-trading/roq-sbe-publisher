@@ -4,6 +4,10 @@
 
 #include <absl/container/flat_hash_map.h>
 
+#include <chrono>
+#include <deque>
+#include <vector>
+
 #include "roq/api.hpp"
 
 #include "roq/io/context.hpp"
@@ -40,10 +44,12 @@ struct Snapshot final : public Base {
 
  private:
   std::chrono::nanoseconds const publish_freq_;
+  Shared &shared_;
   bool ready_ = false;
   absl::flat_hash_map<uint64_t, Instrument> instruments_;
   std::deque<uint64_t> publish_;
   std::chrono::nanoseconds next_publish_ = {};
+  std::vector<MBPUpdate> bids_, asks_;
 };
 
 }  // namespace publisher
