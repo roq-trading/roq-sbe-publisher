@@ -10,6 +10,8 @@
 
 #include "roq/debug/hex/message.hpp"
 
+#include "roq/sbe/codec/header.hpp"
+
 using namespace std::literals;
 
 namespace roq {
@@ -71,18 +73,13 @@ void Base::send(std::span<std::byte const> const &payload) {
     auto offset = index * MAX_PAYLOAD_SIZE;
     auto length = std::min(std::size(payload) - offset, MAX_PAYLOAD_SIZE);
     auto payload_2 = payload.subspan(offset, length);
-    struct __attribute__((packed)) Header final {
-      uint16_t session_id;
-      uint32_t sequence_number;
-      uint8_t fragment;
-      uint8_t fragment_max;
-    } header{
+    auto header = sbe::codec::Header{
         .session_id = shared_.session_id,  // note! random number => byte ordering not important
         .sequence_number = absl::little_endian::FromHost(++sequence_number_),
         .fragment = static_cast<uint8_t>(index),
         .fragment_max = static_cast<uint8_t>(fragment_number_max),
     };
-    static_assert(sizeof(Header) == 8);
+    static_assert(sizeof(header) == 8);
     log::info<1>(
         "[{}:{}:{}] {}"sv, sequence_number_, header.fragment, header.fragment_max, debug::hex::Message{payload_2});
     std::span header_2{reinterpret_cast<std::byte const *>(&header), sizeof(header)};

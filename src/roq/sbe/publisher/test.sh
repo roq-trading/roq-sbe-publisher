@@ -21,7 +21,7 @@ $PREFIX "./roq-sbe-publisher" \
   --name "$NAME" \
   --config_file "test.toml" \
   --local_interface 192.168.188.64 \
-  --multicast_address_snapshot 224.1.1.2 \
+  --multicast_address_snapshot 224.1.1.1 \
   --multicast_port_snapshot 1234 \
   --multicast_address_incremental 224.1.1.1 \
   --multicast_port_incremental 6789 \
