@@ -4,7 +4,7 @@
 
 #include "roq/logging.hpp"
 
-#include "roq/sbe/codec/encoder.hpp"
+#include "roq/codec/sbe/encoder.hpp"
 
 #include "roq/core/routing/utility.hpp"
 
@@ -136,13 +136,13 @@ void Snapshot::publish(Instrument const &instrument) {
   auto reference_data = instrument.reference_data.convert(instrument);
   // log::debug("reference_data={}"sv, reference_data);
   Event event_1{message_info, reference_data};
-  auto message_1 = codec::Encoder::encode(encode_buffer_, event_1);
+  auto message_1 = codec::sbe::Encoder::encode(encode_buffer_, event_1);
   send(message_1);
   // market status
   auto market_status = instrument.market_status.convert(instrument);
   // log::debug("market_status={}"sv, market_status);
   Event event_2{message_info, market_status};
-  auto message_2 = codec::Encoder::encode(encode_buffer_, event_2);
+  auto message_2 = codec::sbe::Encoder::encode(encode_buffer_, event_2);
   send(message_2);
   // market by price
   (*instrument.market_by_price).create_snapshot(bids_, asks_, [&](auto &market_by_price_update) {
@@ -152,14 +152,14 @@ void Snapshot::publish(Instrument const &instrument) {
     tmp.bids = {std::data(market_by_price_update.bids), std::min<size_t>(1024, std::size(market_by_price_update.bids))};
     tmp.asks = {std::data(market_by_price_update.asks), std::min<size_t>(1024, std::size(market_by_price_update.asks))};
     Event event_3{message_info, tmp};
-    auto message_3 = codec::Encoder::encode(encode_buffer_, event_3);
+    auto message_3 = codec::sbe::Encoder::encode(encode_buffer_, event_3);
     send(message_3);
   });
   // statistics
   auto statistics_update = instrument.statistics.convert(instrument);
   // log::debug("statistics_update={}"sv, statistics_update);
   Event event_4{message_info, statistics_update};
-  auto message_4 = codec::Encoder::encode(encode_buffer_, event_4);
+  auto message_4 = codec::sbe::Encoder::encode(encode_buffer_, event_4);
   send(message_4);
 }
 
