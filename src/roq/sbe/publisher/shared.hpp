@@ -11,6 +11,8 @@ namespace publisher {
 struct Shared final {
   Shared();
 
+  Shared(Shared const &) = delete;
+
   uint16_t const session_id;
 
   Source source_name;

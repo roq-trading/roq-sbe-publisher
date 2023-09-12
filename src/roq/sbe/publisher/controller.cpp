@@ -80,7 +80,8 @@ void Controller::operator()(Event<StatisticsUpdate> const &event) {
 
 template <typename T>
 void Controller::dispatch(Event<T> const &event, bool ready) {
-  shared_.source_seqno = event.message_info.source_seqno;
+  if (event.message_info.source_seqno)  // note! timer shouldn't update
+    shared_.source_seqno = event.message_info.source_seqno;
   if (ready)
     incremental_(event);
   snapshot_(event);
