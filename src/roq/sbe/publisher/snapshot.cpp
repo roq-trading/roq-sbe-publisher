@@ -71,19 +71,16 @@ void Snapshot::publish(Instrument const &instrument) {
   };
   // reference data
   auto reference_data = static_cast<ReferenceData>(instrument);
-  // log::debug("reference_data={}"sv, reference_data);
   Event event_1{message_info, reference_data};
   auto message_1 = codec::sbe::Encoder::encode(encode_buffer_, event_1);
   send(message_1, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.reference_data);
   // market status
   auto market_status = static_cast<MarketStatus>(instrument);
-  // log::debug("market_status={}"sv, market_status);
   Event event_2{message_info, market_status};
   auto message_2 = codec::sbe::Encoder::encode(encode_buffer_, event_2);
   send(message_2, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.market_status);
   // market by price
   instrument.create_market_by_price_snapshot(bids_, asks_, [&](auto &market_by_price_update) {
-    // log::debug("market_by_price_update={}"sv, market_by_price_update);
     // XXX FIXME HACK !!!
     auto tmp = market_by_price_update;
     tmp.bids = {std::data(market_by_price_update.bids), std::min<size_t>(1024, std::size(market_by_price_update.bids))};
@@ -94,7 +91,6 @@ void Snapshot::publish(Instrument const &instrument) {
   });
   // statistics
   auto statistics_update = static_cast<StatisticsUpdate>(instrument);
-  // log::debug("statistics_update={}"sv, statistics_update);
   Event event_4{message_info, statistics_update};
   auto message_4 = codec::sbe::Encoder::encode(encode_buffer_, event_4);
   send(message_4, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.statistics);
