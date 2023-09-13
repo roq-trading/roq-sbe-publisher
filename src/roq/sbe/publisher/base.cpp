@@ -2,14 +2,13 @@
 
 #include "roq/sbe/publisher/base.hpp"
 
-#include <absl/base/internal/endian.h>
-
 #include "roq/logging.hpp"
 
 #include "roq/utils/math.hpp"
 
 #include "roq/debug/hex/message.hpp"
 
+#include "roq/codec/sbe/encoder.hpp"
 #include "roq/codec/sbe/header.hpp"
 
 using namespace std::literals;
@@ -82,13 +81,13 @@ void Base::send(
         .control = control,
         .object_type = object_type,
         .session_id = shared_.session_id,  // note! random number => byte ordering not important
-        .sequence_number = absl::little_endian::FromHost(++sequence_number_),
+        .sequence_number = ++sequence_number_,
         .fragment = static_cast<uint8_t>(index),
         .fragment_max = static_cast<uint8_t>(fragment_number_max),
-        .object_id = absl::little_endian::FromHost(object_id),
-        .last_sequence_number = absl::little_endian::FromHost(last_sequence_number),
+        .object_id = object_id,
+        .last_sequence_number = last_sequence_number,
     };
-    static_assert(sizeof(header) == 16);
+    codec::sbe::Encoder::encode(header);
     log::info<1>(
         "[{}:{}:{}] {}"sv, sequence_number_, header.fragment, header.fragment_max, debug::hex::Message{payload_2});
     std::span header_2{reinterpret_cast<std::byte const *>(&header), sizeof(header)};

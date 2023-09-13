@@ -39,12 +39,16 @@ Instrument::Instrument(
 
 void Instrument::operator()(Event<ReferenceData> const &event, uint32_t sequence_number) {
   last_sequence_number.reference_data = sequence_number;
-  reference_data_(event);
+  if (reference_data_(event)) {
+    // updated
+  }
 }
 
 void Instrument::operator()(Event<MarketStatus> const &event, uint32_t sequence_number) {
   last_sequence_number.market_status = sequence_number;
-  market_status_(event);
+  if (market_status_(event)) {
+    // updated
+  }
 }
 
 void Instrument::operator()(Event<TopOfBook> const &, uint32_t sequence_number) {
@@ -69,7 +73,9 @@ void Instrument::operator()(Event<TradeSummary> const &, uint32_t sequence_numbe
 
 void Instrument::operator()(Event<StatisticsUpdate> const &event, uint32_t sequence_number) {
   last_sequence_number.statistics = sequence_number;
-  statistics_(event);
+  if (statistics_(event)) {
+    // updated
+  }
 }
 
 // ...

@@ -58,7 +58,7 @@ void Incremental::operator()(Instrument const &instrument, Event<MarketByPriceUp
   send(message, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.market_by_price);
 }
 
-void Incremental::operator()(Instrument const &instrument, Event<MarketByOrderUpdate> const &event) {
+void Incremental::operator()(Instrument const &, Event<MarketByOrderUpdate> const &) {
   assert(shared_.ready());
   /*
   auto &[message_info, market_by_order_update] = event;
