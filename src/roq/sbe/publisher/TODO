@@ -1,3 +1,4 @@
-* cache encoded blob
-* proper limited depth
-* object type
+cache encoded blob (?)
+proper limited depth
+use Header.object_type
+align with UDP
