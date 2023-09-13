@@ -5,8 +5,9 @@
 #include "roq/logging.hpp"
 
 #include "roq/codec/sbe/encoder.hpp"
+#include "roq/codec/sbe/header.hpp"
 
-#include "roq/core/routing/utility.hpp"
+#include "roq/sbe/publisher/shared.hpp"
 
 using namespace std::literals;
 
@@ -14,14 +15,11 @@ namespace roq {
 namespace sbe {
 namespace publisher {
 
-// === HELPERS ===
+// === CONSTANTS ===
 
 namespace {
-auto get_instrument_id_from_opaque(auto opaque) {
-  auto routing = core::routing::routing_from_opaque(opaque);
-  return routing.id;
+auto const CONTROL = codec::sbe::ENCODING;
 }
-}  // namespace
 
 // === IMPLEMENTATION ===
 
@@ -31,9 +29,7 @@ Snapshot::Snapshot(Settings const &settings, io::Context &context, Shared &share
 }
 
 void Snapshot::operator()(Event<Timer> const &event) {
-  if (!ready_)
-    return;
-  if (std::empty(instruments_))
+  if (!shared_.ready())  // XXX TODO maybe a latch instead so subsequent disconnects don't stop publishing?
     return;
   auto now = event.value.now;
   if (now < next_publish_)
@@ -41,88 +37,29 @@ void Snapshot::operator()(Event<Timer> const &event) {
   next_publish_ = now + publish_freq_;
   while (true) {
     if (std::empty(publish_)) {
-      for (auto &[instrument_id, _] : instruments_)
-        publish_.emplace_back(instrument_id);
+      shared_.get_all_instruments([&](auto &instrument) { publish_.emplace_back(instrument.instrument_id); });
+      if (std::empty(publish_))
+        return;
     }
     assert(!std::empty(publish_));
     auto instrument_id = publish_.front();
     publish_.pop_front();
-    auto iter = instruments_.find(instrument_id);
-    if (iter != std::end(instruments_)) {
-      auto &instrument = (*iter).second;
-      /*
-      log::debug(
-          R"(publish instrument_id={}, exchange="{}", symbol="{}")"sv,
-          instrument_id,
-          instrument.exchange,
-          instrument.symbol);
-      */
-      publish(instrument);  // XXX TODO cache encoded blob
+    if (shared_.find_instrument(instrument_id, [&](auto &instrument) { publish(instrument); })) {
       break;
+    } else {
+      assert(false);
     }
   }
 }
 
-void Snapshot::operator()(Event<Connected> const &) {
-}
-
-void Snapshot::operator()(Event<Disconnected> const &) {
-  ready_ = false;
-  instruments_.clear();
-  publish_.clear();
-}
-
-void Snapshot::operator()(Event<Ready> const &) {
-  ready_ = true;
-}
-
-void Snapshot::operator()(Event<ReferenceData> const &event) {
-  if (event.value.discard)
-    return;
-  dispatch(event);
-}
-
-void Snapshot::operator()(Event<MarketStatus> const &event) {
-  dispatch(event);
-}
-
-void Snapshot::operator()(Event<TopOfBook> const &) {
-  // note! we don't cache
-}
-
-void Snapshot::operator()(Event<MarketByPriceUpdate> const &event) {
-  dispatch(event);
-}
-
-void Snapshot::operator()(Event<MarketByOrderUpdate> const &) {
-  // note! we don't cache
-}
-
-void Snapshot::operator()(Event<TradeSummary> const &) {
-  // note! we don't cache
-}
-
-void Snapshot::operator()(Event<StatisticsUpdate> const &event) {
-  dispatch(event);
-}
-
 // utilities
-
-template <typename T>
-void Snapshot::dispatch(Event<T> const &event) {
-  auto instrument_id = get_instrument_id_from_opaque(event.message_info.opaque);
-  auto iter = instruments_.find(instrument_id);
-  if (iter == std::end(instruments_))
-    iter = instruments_.try_emplace(instrument_id, event.value.exchange, event.value.symbol).first;
-  (*iter).second(event);
-}
 
 void Snapshot::publish(Instrument const &instrument) {
   auto message_info = MessageInfo{
       .source = SOURCE_NONE,
-      .source_name = shared_.source_name,
-      .source_session_id = shared_.source_session_id,
-      .source_seqno = shared_.source_seqno,
+      .source_name = shared_.get_source_name(),
+      .source_session_id = shared_.get_source_session_id(),
+      .source_seqno = shared_.get_source_seqno(),
       .receive_time_utc = {},
       .receive_time = {},
       .source_send_time = {},
@@ -133,19 +70,19 @@ void Snapshot::publish(Instrument const &instrument) {
       .opaque = {},
   };
   // reference data
-  auto reference_data = instrument.reference_data.convert(instrument);
+  auto reference_data = static_cast<ReferenceData>(instrument);
   // log::debug("reference_data={}"sv, reference_data);
   Event event_1{message_info, reference_data};
   auto message_1 = codec::sbe::Encoder::encode(encode_buffer_, event_1);
-  send(message_1);
+  send(message_1, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.reference_data);
   // market status
-  auto market_status = instrument.market_status.convert(instrument);
+  auto market_status = static_cast<MarketStatus>(instrument);
   // log::debug("market_status={}"sv, market_status);
   Event event_2{message_info, market_status};
   auto message_2 = codec::sbe::Encoder::encode(encode_buffer_, event_2);
-  send(message_2);
+  send(message_2, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.market_status);
   // market by price
-  (*instrument.market_by_price).create_snapshot(bids_, asks_, [&](auto &market_by_price_update) {
+  instrument.create_market_by_price_snapshot(bids_, asks_, [&](auto &market_by_price_update) {
     // log::debug("market_by_price_update={}"sv, market_by_price_update);
     // XXX FIXME HACK !!!
     auto tmp = market_by_price_update;
@@ -153,14 +90,14 @@ void Snapshot::publish(Instrument const &instrument) {
     tmp.asks = {std::data(market_by_price_update.asks), std::min<size_t>(1024, std::size(market_by_price_update.asks))};
     Event event_3{message_info, tmp};
     auto message_3 = codec::sbe::Encoder::encode(encode_buffer_, event_3);
-    send(message_3);
+    send(message_3, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.market_by_price);
   });
   // statistics
-  auto statistics_update = instrument.statistics.convert(instrument);
+  auto statistics_update = static_cast<StatisticsUpdate>(instrument);
   // log::debug("statistics_update={}"sv, statistics_update);
   Event event_4{message_info, statistics_update};
   auto message_4 = codec::sbe::Encoder::encode(encode_buffer_, event_4);
-  send(message_4);
+  send(message_4, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.statistics);
 }
 
 }  // namespace publisher

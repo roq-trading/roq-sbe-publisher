@@ -21,20 +21,15 @@ Controller::Controller(client::Dispatcher &dispatcher, Settings const &settings,
 
 void Controller::operator()(Event<Timer> const &event) {
   context_.drain();
-  dispatch(event, true);
+  snapshot_(event);
 }
 
 void Controller::operator()(Event<Connected> const &event) {
-  shared_.source_name = event.message_info.source_name;
-  shared_.source_session_id = event.message_info.source_session_id;
-  dispatch(event, true);
+  shared_(event);
 }
 
 void Controller::operator()(Event<Disconnected> const &event) {
-  ready_ = false;
-  shared_.source_name.clear();
-  shared_.source_session_id = {};
-  dispatch(event, true);
+  shared_(event);
 }
 
 void Controller::operator()(Event<DownloadBegin> const &) {
@@ -44,47 +39,48 @@ void Controller::operator()(Event<DownloadEnd> const &) {
 }
 
 void Controller::operator()(Event<Ready> const &event) {
-  ready_ = true;
-  dispatch(event, true);
+  shared_(event);
 }
 
 void Controller::operator()(Event<ReferenceData> const &event) {
-  dispatch(event, ready_);
+  dispatch(event);
 }
 
 void Controller::operator()(Event<MarketStatus> const &event) {
-  dispatch(event, ready_);
+  dispatch(event);
 }
 
 void Controller::operator()(Event<TopOfBook> const &event) {
-  dispatch(event, ready_);
+  dispatch(event);
 }
 
 void Controller::operator()(Event<MarketByPriceUpdate> const &event) {
-  dispatch(event, ready_);
+  dispatch(event);
 }
 
 void Controller::operator()(Event<MarketByOrderUpdate> const &event) {
-  dispatch(event, ready_);
+  dispatch(event);
 }
 
 void Controller::operator()(Event<TradeSummary> const &event) {
-  dispatch(event, ready_);
+  dispatch(event);
 }
 
 void Controller::operator()(Event<StatisticsUpdate> const &event) {
-  dispatch(event, ready_);
+  dispatch(event);
 }
 
 // utilities
 
 template <typename T>
-void Controller::dispatch(Event<T> const &event, bool ready) {
-  if (event.message_info.source_seqno)  // note! timer shouldn't update
-    shared_.source_seqno = event.message_info.source_seqno;
-  if (ready)
-    incremental_(event);
-  snapshot_(event);
+void Controller::dispatch(Event<T> const &event) {
+  shared_(event.message_info);
+  shared_.find_instrument_or_create(
+      event.message_info.opaque, event.value.exchange, event.value.symbol, [&](auto &instrument) {
+        if (shared_.ready())
+          incremental_(instrument, event);
+        instrument(event, incremental_.get_sequence_number());  // note! *after* incremental
+      });
 }
 
 }  // namespace publisher

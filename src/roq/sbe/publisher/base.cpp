@@ -66,7 +66,12 @@ void Base::operator()(io::net::udp::Sender::Error const &) {
 
 // utilities
 
-void Base::send(std::span<std::byte const> const &payload) {
+void Base::send(
+    std::span<std::byte const> const &payload,
+    uint8_t control,
+    uint8_t object_type,
+    uint16_t object_id,
+    uint32_t last_sequence_number) {
   auto total_fragments = utils::round_up<MAX_PAYLOAD_SIZE>(std::size(payload)) / MAX_PAYLOAD_SIZE;
   auto fragment_number_max = std::max<size_t>(1, total_fragments) - 1;
   for (size_t index = 0; index < total_fragments; ++index) {
@@ -74,12 +79,16 @@ void Base::send(std::span<std::byte const> const &payload) {
     auto length = std::min(std::size(payload) - offset, MAX_PAYLOAD_SIZE);
     auto payload_2 = payload.subspan(offset, length);
     auto header = codec::sbe::Header{
+        .control = control,
+        .object_type = object_type,
         .session_id = shared_.session_id,  // note! random number => byte ordering not important
         .sequence_number = absl::little_endian::FromHost(++sequence_number_),
         .fragment = static_cast<uint8_t>(index),
         .fragment_max = static_cast<uint8_t>(fragment_number_max),
+        .object_id = absl::little_endian::FromHost(object_id),
+        .last_sequence_number = absl::little_endian::FromHost(last_sequence_number),
     };
-    static_assert(sizeof(header) == 8);
+    static_assert(sizeof(header) == 16);
     log::info<1>(
         "[{}:{}:{}] {}"sv, sequence_number_, header.fragment, header.fragment_max, debug::hex::Message{payload_2});
     std::span header_2{reinterpret_cast<std::byte const *>(&header), sizeof(header)};

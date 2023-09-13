@@ -39,7 +39,7 @@ struct Controller final : public client::Handler {
   void operator()(Event<StatisticsUpdate> const &) override;
 
   template <typename T>
-  void dispatch(Event<T> const &, bool ready);
+  void dispatch(Event<T> const &);
 
  private:
   client::Dispatcher &dispatcher_;
@@ -47,7 +47,6 @@ struct Controller final : public client::Handler {
   Shared shared_;
   Incremental incremental_;
   Snapshot snapshot_;
-  bool ready_ = false;
 };
 
 }  // namespace publisher

@@ -7,6 +7,7 @@
 #include "roq/io/context.hpp"
 
 #include "roq/sbe/publisher/base.hpp"
+#include "roq/sbe/publisher/instrument.hpp"
 #include "roq/sbe/publisher/settings.hpp"
 #include "roq/sbe/publisher/shared.hpp"
 
@@ -17,20 +18,16 @@ namespace publisher {
 struct Incremental final : public Base {
   Incremental(Settings const &, io::Context &context, Shared &);
 
-  void operator()(Event<Timer> const &);
-  void operator()(Event<Connected> const &);
-  void operator()(Event<Disconnected> const &);
-  void operator()(Event<Ready> const &);
-  void operator()(Event<ReferenceData> const &);
-  void operator()(Event<MarketStatus> const &);
-  void operator()(Event<TopOfBook> const &);
-  void operator()(Event<MarketByPriceUpdate> const &);
-  void operator()(Event<MarketByOrderUpdate> const &);
-  void operator()(Event<TradeSummary> const &);
-  void operator()(Event<StatisticsUpdate> const &);
+  void operator()(Instrument const &, Event<ReferenceData> const &);
+  void operator()(Instrument const &, Event<MarketStatus> const &);
+  void operator()(Instrument const &, Event<TopOfBook> const &);
+  void operator()(Instrument const &, Event<MarketByPriceUpdate> const &);
+  void operator()(Instrument const &, Event<MarketByOrderUpdate> const &);
+  void operator()(Instrument const &, Event<TradeSummary> const &);
+  void operator()(Instrument const &, Event<StatisticsUpdate> const &);
 
  private:
-  bool ready_ = false;
+  Shared &shared_;
 };
 
 }  // namespace publisher

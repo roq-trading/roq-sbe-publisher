@@ -4,6 +4,8 @@
 
 #include "roq/client.hpp"
 
+#include "roq/codec/sbe/encoder.hpp"
+
 using namespace std::literals;
 
 namespace roq {
@@ -20,34 +22,80 @@ auto create_market_by_price(auto &exchange, auto &symbol) {
   };
   return client::MarketByPriceFactory::create_new(exchange, symbol, options);
 }
+
+struct Context final {
+  std::string_view exchange;
+  std::string_view symbol;
+};
 }  // namespace
 
 // === IMPLEMENTATION ===
 
-Instrument::Instrument(std::string_view const &exchange, std::string_view const &symbol)
-    : exchange{exchange}, symbol{symbol}, market_by_price{create_market_by_price(exchange, symbol)} {
+Instrument::Instrument(
+    uint32_t instrument_id, uint16_t object_id, std::string_view const &exchange, std::string_view const &symbol)
+    : instrument_id{instrument_id}, object_id{object_id}, exchange{exchange}, symbol{symbol},
+      market_by_price_{create_market_by_price(exchange, symbol)} {
 }
 
-void Instrument::operator()(Event<ReferenceData> const &event) {
-  if (reference_data(event)) {
-    // updated
-  }
+void Instrument::operator()(Event<ReferenceData> const &event, uint32_t sequence_number) {
+  last_sequence_number.reference_data = sequence_number;
+  reference_data_(event);
 }
 
-void Instrument::operator()(Event<MarketStatus> const &event) {
-  if (market_status(event)) {
-    // updated
-  }
+void Instrument::operator()(Event<MarketStatus> const &event, uint32_t sequence_number) {
+  last_sequence_number.market_status = sequence_number;
+  market_status_(event);
 }
 
-void Instrument::operator()(Event<MarketByPriceUpdate> const &event) {
-  (*market_by_price)(event);
+void Instrument::operator()(Event<TopOfBook> const &, uint32_t sequence_number) {
+  last_sequence_number.top_of_book = sequence_number;
+  // not cached
 }
 
-void Instrument::operator()(Event<StatisticsUpdate> const &event) {
-  if (statistics(event)) {
-    // updated
-  }
+void Instrument::operator()(Event<MarketByPriceUpdate> const &event, uint32_t sequence_number) {
+  last_sequence_number.market_by_price = sequence_number;
+  (*market_by_price_)(event);
+}
+
+void Instrument::operator()(Event<MarketByOrderUpdate> const &, uint32_t sequence_number) {
+  last_sequence_number.market_by_order = sequence_number;
+  // XXX TODO
+}
+
+void Instrument::operator()(Event<TradeSummary> const &, uint32_t sequence_number) {
+  last_sequence_number.trade_summary = sequence_number;
+  // not cached
+}
+
+void Instrument::operator()(Event<StatisticsUpdate> const &event, uint32_t sequence_number) {
+  last_sequence_number.statistics = sequence_number;
+  statistics_(event);
+}
+
+// ...
+
+Instrument::operator ReferenceData() const {
+  auto context = Context{
+      .exchange = exchange,
+      .symbol = symbol,
+  };
+  return reference_data_.convert(context);
+}
+
+Instrument::operator MarketStatus() const {
+  auto context = Context{
+      .exchange = exchange,
+      .symbol = symbol,
+  };
+  return market_status_.convert(context);
+}
+
+Instrument::operator StatisticsUpdate() const {
+  auto context = Context{
+      .exchange = exchange,
+      .symbol = symbol,
+  };
+  return statistics_.convert(context);
 }
 
 }  // namespace publisher
