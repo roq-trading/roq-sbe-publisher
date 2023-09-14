@@ -18,7 +18,7 @@ namespace publisher {
 // === CONSTANTS ===
 
 namespace {
-auto const CONTROL = codec::sbe::ENCODING;
+auto const CONTROL = codec::sbe::ENCODING_SBE;
 }
 
 // === IMPLEMENTATION ===
