@@ -56,6 +56,7 @@ find_package(roq-flags REQUIRED)
 find_package(roq-io REQUIRED)
 find_package(roq-logging REQUIRED)
 find_package(roq-sbe-codec REQUIRED)
+find_package(roq-udp-codec REQUIRED)
 find_package(tomlplusplus REQUIRED)
 
 if(UNIX AND NOT APPLE)

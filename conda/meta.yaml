@@ -32,6 +32,7 @@ requirements:
     - roq-oss-catch2  # [osx]
     - roq-oss-tomlplusplus
     - roq-sbe-codec
+    - roq-udp-codec
 
 about:
   home: https://roq-trading.com
