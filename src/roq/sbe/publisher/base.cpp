@@ -8,8 +8,9 @@
 
 #include "roq/debug/hex/message.hpp"
 
+#include "roq/codec/udp/encoder.hpp"
+
 #include "roq/codec/sbe/encoder.hpp"
-#include "roq/codec/sbe/header.hpp"
 
 using namespace std::literals;
 
@@ -77,7 +78,7 @@ void Base::send(
     auto offset = index * MAX_PAYLOAD_SIZE;
     auto length = std::min(std::size(payload) - offset, MAX_PAYLOAD_SIZE);
     auto payload_2 = payload.subspan(offset, length);
-    auto header = codec::sbe::Header{
+    auto header = codec::udp::Header{
         .control = control,
         .object_type = object_type,
         .session_id = shared_.session_id,  // note! random number => byte ordering not important
@@ -87,7 +88,7 @@ void Base::send(
         .object_id = object_id,
         .last_sequence_number = last_sequence_number,
     };
-    codec::sbe::Encoder::encode(header);
+    codec::udp::Encoder::encode(header);
     log::info<1>(
         "[{}:{}:{}] {}"sv, sequence_number_, header.fragment, header.fragment_max, debug::hex::Message{payload_2});
     std::span header_2{reinterpret_cast<std::byte const *>(&header), sizeof(header)};

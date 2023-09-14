@@ -4,8 +4,9 @@
 
 #include "roq/logging.hpp"
 
+#include "roq/codec/udp/header.hpp"
+
 #include "roq/codec/sbe/encoder.hpp"
-#include "roq/codec/sbe/header.hpp"
 
 using namespace std::literals;
 
@@ -16,7 +17,7 @@ namespace publisher {
 // === CONSTANTS ===
 
 namespace {
-auto const CONTROL = codec::sbe::ENCODING_SBE | codec::sbe::INCREMENTAL;
+auto const CONTROL = codec::udp::pack(codec::udp::Encoding::SBE, codec::udp::Channel::INCREMENTAL);
 }
 
 // === IMPLEMENTATION ===
