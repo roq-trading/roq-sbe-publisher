@@ -12,9 +12,8 @@ namespace publisher {
 
 // === IMPLEMENTATION ===
 
-Controller::Controller(client::Dispatcher &dispatcher, Settings const &settings, Config const &, io::Context &context)
-    : dispatcher_{dispatcher}, context_{context}, incremental_{settings, context, shared_},
-      snapshot_{settings, context, shared_} {
+Controller::Controller(client::Dispatcher &, Settings const &settings, Config const &, io::Context &context)
+    : context_{context}, incremental_{settings, context, shared_}, snapshot_{settings, context, shared_} {
 }
 
 // client::Handler

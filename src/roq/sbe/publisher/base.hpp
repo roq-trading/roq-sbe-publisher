@@ -38,7 +38,7 @@ struct Base : public io::net::udp::Sender::Handler {
 
  private:
   Shared const &shared_;
-  std::unique_ptr<io::Sender> const sender_;
+  std::unique_ptr<io::Sender> sender_;
   uint32_t sequence_number_ = {};
 };
 

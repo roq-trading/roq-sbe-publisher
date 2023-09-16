@@ -42,7 +42,6 @@ struct Controller final : public client::Handler {
   void dispatch(Event<T> const &);
 
  private:
-  client::Dispatcher &dispatcher_;
   io::Context &context_;
   Shared shared_;
   Incremental incremental_;
