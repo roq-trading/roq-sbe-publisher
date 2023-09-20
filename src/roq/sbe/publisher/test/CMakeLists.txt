@@ -1,5 +1,7 @@
 set(TARGET_NAME ${PROJECT_NAME}-test)
 
+include(RoqAutogen)
+
 set(SOURCES dummy.cpp main.cpp)
 
 roq_gitignore(OUTPUT .gitignore SOURCES ${TARGET_NAME})
