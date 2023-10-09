@@ -6,8 +6,6 @@
 
 #include "roq/codec/udp/header.hpp"
 
-#include "roq/codec/sbe/encoder.hpp"
-
 #include "roq/sbe/publisher/shared.hpp"
 
 using namespace std::literals;
@@ -26,7 +24,7 @@ auto const CONTROL = codec::udp::pack(codec::udp::Encoding::SBE, codec::udp::Cha
 
 Snapshot::Snapshot(Settings const &settings, io::Context &context, Shared &shared)
     : Base{settings, context, shared, settings.multicast_address_snapshot, settings.multicast_port_snapshot},
-      publish_freq_{settings.snapshot_publish_freq}, shared_{shared} {
+      publish_freq_{settings.snapshot_publish_freq}, shared_{shared}, encoder_{codec::sbe::Encoder::create()} {
 }
 
 void Snapshot::operator()(Event<Timer> const &event) {
@@ -73,12 +71,12 @@ void Snapshot::publish(Instrument const &instrument) {
   // reference data
   auto reference_data = static_cast<ReferenceData>(instrument);
   Event event_1{message_info, reference_data};
-  auto message_1 = codec::sbe::Encoder::encode(encode_buffer_, event_1);
+  auto message_1 = (*encoder_)(event_1);
   send(message_1, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.reference_data);
   // market status
   auto market_status = static_cast<MarketStatus>(instrument);
   Event event_2{message_info, market_status};
-  auto message_2 = codec::sbe::Encoder::encode(encode_buffer_, event_2);
+  auto message_2 = (*encoder_)(event_2);
   send(message_2, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.market_status);
   // market by price
   instrument.create_market_by_price_snapshot(bids_, asks_, [&](auto &market_by_price_update) {
@@ -87,13 +85,13 @@ void Snapshot::publish(Instrument const &instrument) {
     tmp.bids = {std::data(market_by_price_update.bids), std::min<size_t>(1024, std::size(market_by_price_update.bids))};
     tmp.asks = {std::data(market_by_price_update.asks), std::min<size_t>(1024, std::size(market_by_price_update.asks))};
     Event event_3{message_info, tmp};
-    auto message_3 = codec::sbe::Encoder::encode(encode_buffer_, event_3);
+    auto message_3 = (*encoder_)(event_3);
     send(message_3, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.market_by_price);
   });
   // statistics
   auto statistics_update = static_cast<StatisticsUpdate>(instrument);
   Event event_4{message_info, statistics_update};
-  auto message_4 = codec::sbe::Encoder::encode(encode_buffer_, event_4);
+  auto message_4 = (*encoder_)(event_4);
   send(message_4, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.statistics);
 }
 

@@ -28,8 +28,7 @@ target_link_libraries(
           roq-client::roq-client
           roq-client::roq-client-flags
           roq-io::roq-io
-          roq-sbe-codec::roq-sbe-codec
-          roq-udp-codec::roq-udp-codec
+          roq-codec::roq-codec
           roq-logging::roq-logging
           roq-logging::roq-logging-flags
           roq-flags::roq-flags

@@ -6,8 +6,6 @@
 
 #include "roq/codec/udp/header.hpp"
 
-#include "roq/codec/sbe/encoder.hpp"
-
 using namespace std::literals;
 
 namespace roq {
@@ -24,26 +22,26 @@ auto const CONTROL = codec::udp::pack(codec::udp::Encoding::SBE, codec::udp::Cha
 
 Incremental::Incremental(Settings const &settings, io::Context &context, Shared &shared)
     : Base{settings, context, shared, settings.multicast_address_incremental, settings.multicast_port_incremental},
-      shared_{shared} {
+      shared_{shared}, encoder_{codec::sbe::Encoder::create()} {
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<ReferenceData> const &event) {
   assert(shared_.ready());
   if (event.value.discard)
     return;
-  auto message = codec::sbe::Encoder::encode(encode_buffer_, event);
+  auto message = (*encoder_)(event);
   send(message, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.reference_data);
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<MarketStatus> const &event) {
   assert(shared_.ready());
-  auto message = codec::sbe::Encoder::encode(encode_buffer_, event);
+  auto message = (*encoder_)(event);
   send(message, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.market_status);
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<TopOfBook> const &event) {
   assert(shared_.ready());
-  auto message = codec::sbe::Encoder::encode(encode_buffer_, event);
+  auto message = (*encoder_)(event);
   send(message, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.top_of_book);
 }
 
@@ -55,7 +53,7 @@ void Incremental::operator()(Instrument const &instrument, Event<MarketByPriceUp
   tmp.bids = {std::data(market_by_price_update.bids), std::min<size_t>(1024, std::size(market_by_price_update.bids))};
   tmp.asks = {std::data(market_by_price_update.asks), std::min<size_t>(1024, std::size(market_by_price_update.asks))};
   Event event_2{message_info, tmp};
-  auto message = codec::sbe::Encoder::encode(encode_buffer_, event_2);
+  auto message = (*encoder_)(event_2);
   send(message, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.market_by_price);
 }
 
@@ -63,20 +61,20 @@ void Incremental::operator()(Instrument const &, Event<MarketByOrderUpdate> cons
   assert(shared_.ready());
   /*
   auto &[message_info, market_by_order_update] = event;
-  auto message = codec::sbe::Encoder::encode(encode_buffer_, market_by_order_update);
+  auto message = (*encoder_)( market_by_order_update);
   send(message,CONTROL,0,instrument.object_id, instrument.last_sequence_number.market_by_order);
   */
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<TradeSummary> const &event) {
   assert(shared_.ready());
-  auto message = codec::sbe::Encoder::encode(encode_buffer_, event);
+  auto message = (*encoder_)(event);
   send(message, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.trade_summary);
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<StatisticsUpdate> const &event) {
   assert(shared_.ready());
-  auto message = codec::sbe::Encoder::encode(encode_buffer_, event);
+  auto message = (*encoder_)(event);
   send(message, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.statistics);
 }
 

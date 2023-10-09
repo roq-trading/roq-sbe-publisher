@@ -6,6 +6,8 @@
 
 #include "roq/io/context.hpp"
 
+#include "roq/codec/sbe/encoder.hpp"
+
 #include "roq/sbe/publisher/base.hpp"
 #include "roq/sbe/publisher/instrument.hpp"
 #include "roq/sbe/publisher/settings.hpp"
@@ -28,6 +30,7 @@ struct Incremental final : public Base {
 
  private:
   Shared &shared_;
+  std::unique_ptr<codec::sbe::Encoder> encoder_;
 };
 
 }  // namespace publisher
