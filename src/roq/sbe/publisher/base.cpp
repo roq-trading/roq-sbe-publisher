@@ -28,21 +28,31 @@ constexpr auto const MAX_PAYLOAD_SIZE = size_t{1400};
 
 namespace {
 auto create_sender(auto &handler, auto &settings, auto &context, auto &multicast_address, auto multicast_port) {
-  if (std::empty(multicast_address))
-    log::fatal("Unexpected: address is missing"sv);
   if (!multicast_port)
     log::fatal("Unexpected: port is missing"sv);
-  auto network_address = io::NetworkAddress::create_blocking(multicast_address, multicast_port);
   auto socket_options = Mask{
       io::SocketOption::REUSE_ADDRESS,
+      io::SocketOption::REUSE_PORT,
   };
-  return context.create_multicast_sender(
-      handler,
-      network_address,
-      socket_options,
-      settings.local_interface,
-      settings.multicast_ttl,
-      settings.multicast_loop);
+  if (std::empty(multicast_address)) {
+    log::warn(R"(Using UDP (local_interface="{}", port={}))"sv, settings.local_interface, multicast_port);
+    auto network_address = io::NetworkAddress::create_blocking(settings.local_interface, multicast_port);
+    return context.create_udp_sender(handler, network_address, socket_options);
+  } else {
+    log::warn(
+        R"(Using multicast (local_interface="{}", port={}, multicast_address="{}"))"sv,
+        settings.local_interface,
+        multicast_port,
+        multicast_address);
+    auto network_address = io::NetworkAddress::create_blocking(multicast_address, multicast_port);
+    return context.create_multicast_sender(
+        handler,
+        network_address,
+        socket_options,
+        settings.local_interface,
+        settings.multicast_ttl,
+        settings.multicast_loop);
+  }
 }
 }  // namespace
 
