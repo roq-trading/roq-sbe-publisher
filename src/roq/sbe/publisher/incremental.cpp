@@ -16,13 +16,15 @@ namespace publisher {
 
 namespace {
 auto const CONTROL = codec::udp::pack(codec::udp::Encoding::SBE, codec::udp::Channel::INCREMENTAL);
-}
+auto const MAX_DEPTH = 1024 * 1024;
+}  // namespace
 
 // === IMPLEMENTATION ===
 
 Incremental::Incremental(Settings const &settings, io::Context &context, Shared &shared)
     : Base{settings, context, shared, settings.multicast_address_incremental, settings.multicast_port_incremental},
-      shared_{shared}, encoder_{codec::sbe::Encoder::create()} {
+      shared_{shared}, encoder_{codec::sbe::Encoder::create()}, max_depth_{settings.max_depth}, bids_(MAX_DEPTH),
+      asks_(MAX_DEPTH) {
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<ReferenceData> const &event) {
@@ -48,10 +50,15 @@ void Incremental::operator()(Instrument const &instrument, Event<TopOfBook> cons
 void Incremental::operator()(Instrument const &instrument, Event<MarketByPriceUpdate> const &event) {
   assert(shared_.ready());
   auto &[message_info, market_by_price_update] = event;
-  // XXX FIXME HACK !!!
+  auto &market_by_price = instrument.get_market_by_price();
+  auto result = market_by_price.create_depth_update(market_by_price_update, max_depth_, bids_, asks_);
+  /*
+  if (std::empty(result.first) && std::empty(result.second))
+    return;
+  */
   auto tmp = market_by_price_update;
-  tmp.bids = {std::data(market_by_price_update.bids), std::min<size_t>(1024, std::size(market_by_price_update.bids))};
-  tmp.asks = {std::data(market_by_price_update.asks), std::min<size_t>(1024, std::size(market_by_price_update.asks))};
+  tmp.bids = result.first;
+  tmp.asks = result.second;
   Event event_2{message_info, tmp};
   auto message = (*encoder_)(event_2);
   send(message, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.market_by_price);

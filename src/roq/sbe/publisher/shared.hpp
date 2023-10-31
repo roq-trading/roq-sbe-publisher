@@ -60,6 +60,8 @@ struct Shared final {
 
   Instrument &get_instrument(uint64_t opaque, std::string_view const &exchange, std::string_view const &symbol);
 
+  std::vector<MBPUpdate> bids, asks;
+
  private:
   Source source_name_;
   UUID source_session_id_ = {};

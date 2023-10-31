@@ -35,6 +35,8 @@ struct Instrument final {
   }
   operator StatisticsUpdate() const;
 
+  auto &get_market_by_price() const { return *market_by_price_; }
+
   uint32_t const instrument_id;
   uint16_t const object_id;
 

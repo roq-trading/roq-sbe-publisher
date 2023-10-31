@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "roq/api.hpp"
 
 #include "roq/io/context.hpp"
@@ -31,6 +33,8 @@ struct Incremental final : public Base {
  private:
   Shared &shared_;
   std::unique_ptr<codec::sbe::Encoder> encoder_;
+  size_t const max_depth_;
+  std::vector<MBPUpdate> bids_, asks_;
 };
 
 }  // namespace publisher

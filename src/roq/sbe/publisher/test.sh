@@ -28,4 +28,5 @@ $PREFIX "./roq-sbe-publisher" \
   --multicast_ttl 4 \
   --multicast_loop=true \
   --snapshot_publish_freq 5s \
+  --max_depth 5 \
   $@

@@ -37,6 +37,7 @@ struct Snapshot final : public Base {
   std::unique_ptr<codec::sbe::Encoder> encoder_;
   std::deque<uint16_t> publish_;
   std::chrono::nanoseconds next_publish_ = {};
+  size_t const max_depth_;
   std::vector<MBPUpdate> bids_, asks_;
 };
 

@@ -24,7 +24,8 @@ auto const CONTROL = codec::udp::pack(codec::udp::Encoding::SBE, codec::udp::Cha
 
 Snapshot::Snapshot(Settings const &settings, io::Context &context, Shared &shared)
     : Base{settings, context, shared, settings.multicast_address_snapshot, settings.multicast_port_snapshot},
-      publish_freq_{settings.snapshot_publish_freq}, shared_{shared}, encoder_{codec::sbe::Encoder::create()} {
+      publish_freq_{settings.snapshot_publish_freq}, shared_{shared}, encoder_{codec::sbe::Encoder::create()},
+      max_depth_{settings.max_depth} {
 }
 
 void Snapshot::operator()(Event<Timer> const &event) {
@@ -80,10 +81,9 @@ void Snapshot::publish(Instrument const &instrument) {
   send(message_2, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.market_status);
   // market by price
   instrument.create_market_by_price_snapshot(bids_, asks_, [&](auto &market_by_price_update) {
-    // XXX FIXME HACK !!!
     auto tmp = market_by_price_update;
-    tmp.bids = {std::data(market_by_price_update.bids), std::min<size_t>(1024, std::size(market_by_price_update.bids))};
-    tmp.asks = {std::data(market_by_price_update.asks), std::min<size_t>(1024, std::size(market_by_price_update.asks))};
+    tmp.bids = {std::data(market_by_price_update.bids), std::min(max_depth_, std::size(market_by_price_update.bids))};
+    tmp.asks = {std::data(market_by_price_update.asks), std::min(max_depth_, std::size(market_by_price_update.asks))};
     Event event_3{message_info, tmp};
     auto message_3 = (*encoder_)(event_3);
     send(message_3, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.market_by_price);

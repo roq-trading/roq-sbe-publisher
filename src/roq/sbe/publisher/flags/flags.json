@@ -58,6 +58,12 @@
       "type": "uint32_t",
       "default": 1048576,
       "description": "encode buffer size"
+    },
+    {
+      "name": "max_depth",
+      "type": "uint16_t",
+      "default": 100,
+      "description": "Depth (maximum)"
     }
   ]
 }
