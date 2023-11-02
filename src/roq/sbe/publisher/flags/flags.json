@@ -37,7 +37,7 @@
     {
       "name": "multicast_ttl",
       "type": "uint16_t",
-      "default": 1,
+      "default": 4,
       "description": "UDP publish ttl"
     },
     {
