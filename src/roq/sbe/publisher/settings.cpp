@@ -11,7 +11,7 @@ namespace sbe {
 namespace publisher {
 
 Settings::Settings(args::Parser const &args) : client::flags::Settings{args}, flags::Flags{flags::Flags::create()} {
-  log::debug("settings={}"sv, *this);
+  log::info("settings={}"sv, *this);
 }
 
 }  // namespace publisher
