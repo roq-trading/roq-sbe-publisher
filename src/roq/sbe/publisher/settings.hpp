@@ -26,19 +26,15 @@ struct Settings final : public client::flags::Settings, public flags::Flags {
 
 template <>
 struct fmt::formatter<roq::sbe::publisher::Settings> {
-  template <typename Context>
-  constexpr auto parse(Context &context) {
-    return std::begin(context);
-  }
-  template <typename Context>
-  auto format(roq::sbe::publisher::Settings const &value, Context &context) const {
-    using namespace fmt::literals;
+  constexpr auto parse(format_parse_context &context) { return std::begin(context); }
+  auto format(roq::sbe::publisher::Settings const &value, format_context &context) const {
+    using namespace std::literals;
     return fmt::format_to(
         context.out(),
         R"({{)"
         R"(client={}, )"
         R"(flags={})"
-        R"(}})"_cf,
+        R"(}})"sv,
         static_cast<roq::client::Settings2 const &>(value),
         static_cast<roq::sbe::publisher::flags::Flags const &>(value));
   }
