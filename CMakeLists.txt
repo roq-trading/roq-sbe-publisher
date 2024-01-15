@@ -17,6 +17,10 @@ include(GetGitRepoVersion)
 
 project(roq-sbe-publisher)
 
+# filesystem
+
+include(GNUInstallDirs)
+
 # dependencies
 
 find_package(absl REQUIRED)
