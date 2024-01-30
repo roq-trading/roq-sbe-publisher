@@ -26,14 +26,13 @@ requirements:
     - pkg-config
   host:
     - abseil-cpp
-    - catch2  # [linux]
+    - catch2
     - roq-client
     - roq-codec
     - roq-core
     - roq-flags
     - roq-io
     - roq-oss-benchmark
-    - roq-oss-catch2  # [osx]
     - roq-oss-tomlplusplus
 
 about:
