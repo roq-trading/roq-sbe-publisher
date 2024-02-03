@@ -3,3 +3,6 @@ regex=["USD.*", "BTC.*"]
 
 [symbols.deribit]
 regex=["BTC-PERPETUAL", "ETH-PERPETUAL"]
+
+[symbols.binance]
+regex=[".*"]

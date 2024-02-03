@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NAME="risk"
+NAME="trader"
 
 KERNEL="$(uname -a)"
 
