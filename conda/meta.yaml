@@ -27,6 +27,7 @@ requirements:
   host:
     - abseil-cpp
     - catch2
+    - roq-cache
     - roq-client
     - roq-codec
     - roq-core

@@ -29,6 +29,7 @@ target_link_libraries(
           roq-client::roq-client-flags
           roq-io::roq-io
           roq-codec::roq-codec
+          roq-cache::roq-cache
           roq-logging::roq-logging
           roq-logging::roq-logging-flags
           roq-flags::roq-flags
