@@ -27,7 +27,7 @@ Incremental::Incremental(Settings const &settings, io::Context &context, Shared 
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<ReferenceData> const &event) {
-  assert(shared_.ready());
+  assert(ready());
   if (event.value.discard)
     return;
   auto message = (*encoder_)(event);
@@ -35,19 +35,19 @@ void Incremental::operator()(Instrument const &instrument, Event<ReferenceData> 
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<MarketStatus> const &event) {
-  assert(shared_.ready());
+  assert(ready());
   auto message = (*encoder_)(event);
   send(message, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.market_status);
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<TopOfBook> const &event) {
-  assert(shared_.ready());
+  assert(ready());
   auto message = (*encoder_)(event);
   send(message, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.top_of_book);
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<MarketByPriceUpdate> const &event) {
-  assert(shared_.ready());
+  assert(ready());
   auto &[message_info, market_by_price_update] = event;
   auto &market_by_price = instrument.get_market_by_price();
   auto result = market_by_price.create_depth_update(market_by_price_update, max_depth_, bids_, asks_);
@@ -64,7 +64,7 @@ void Incremental::operator()(Instrument const &instrument, Event<MarketByPriceUp
 }
 
 void Incremental::operator()(Instrument const &, Event<MarketByOrderUpdate> const &) {
-  assert(shared_.ready());
+  assert(ready());
   /*
   auto &[message_info, market_by_order_update] = event;
   auto message = (*encoder_)( market_by_order_update);
@@ -73,13 +73,13 @@ void Incremental::operator()(Instrument const &, Event<MarketByOrderUpdate> cons
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<TradeSummary> const &event) {
-  assert(shared_.ready());
+  assert(ready());
   auto message = (*encoder_)(event);
   send(message, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.trade_summary);
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<StatisticsUpdate> const &event) {
-  assert(shared_.ready());
+  assert(ready());
   auto message = (*encoder_)(event);
   send(message, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.statistics);
 }

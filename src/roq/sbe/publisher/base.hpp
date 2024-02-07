@@ -17,6 +17,8 @@ struct Base : public io::net::udp::Sender::Handler {
   Base(Base &&) = default;
   Base(Base const &) = delete;
 
+  bool ready() const { return shared_.ready(); }
+
   uint32_t get_sequence_number() const { return sequence_number_; }
 
  protected:
