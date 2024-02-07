@@ -31,7 +31,6 @@ struct Incremental final : public Base {
   void operator()(Instrument const &, Event<StatisticsUpdate> const &);
 
  private:
-  Shared &shared_;
   std::unique_ptr<codec::sbe::Encoder> encoder_;
   size_t const max_depth_;
   std::vector<MBPUpdate> bids_, asks_;

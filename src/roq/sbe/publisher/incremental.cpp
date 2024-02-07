@@ -23,8 +23,7 @@ auto const MAX_DEPTH = 1024 * 1024;
 
 Incremental::Incremental(Settings const &settings, io::Context &context, Shared &shared)
     : Base{settings, context, shared, settings.multicast_address_incremental, settings.multicast_port_incremental},
-      shared_{shared}, encoder_{codec::sbe::Encoder::create()}, max_depth_{settings.max_depth}, bids_(MAX_DEPTH),
-      asks_(MAX_DEPTH) {
+      encoder_{codec::sbe::Encoder::create()}, max_depth_{settings.max_depth}, bids_(MAX_DEPTH), asks_(MAX_DEPTH) {
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<ReferenceData> const &event) {
