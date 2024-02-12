@@ -6,7 +6,7 @@
 
 #include "roq/utils/math.hpp"
 
-#include "roq/debug/hex/message.hpp"
+#include "roq/utils/debug/hex/message.hpp"
 
 #include "roq/codec/udp/encoder.hpp"
 
@@ -100,7 +100,11 @@ void Base::send(
     };
     codec::udp::Encoder::encode(header);
     log::info<1>(
-        "[{}:{}:{}] {}"sv, sequence_number_, header.fragment, header.fragment_max, debug::hex::Message{payload_2});
+        "[{}:{}:{}] {}"sv,
+        sequence_number_,
+        header.fragment,
+        header.fragment_max,
+        utils::debug::hex::Message{payload_2});
     std::span header_2{reinterpret_cast<std::byte const *>(&header), sizeof(header)};
     std::array<std::span<std::byte const>, 2> message{{header_2, payload_2}};
     auto bytes = (*sender_).send(message);

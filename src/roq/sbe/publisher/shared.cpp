@@ -6,7 +6,7 @@
 
 #include "roq/clock.hpp"
 
-#include "roq/debug/hex/message.hpp"
+#include "roq/utils/debug/hex/message.hpp"
 
 #include "roq/core/routing/utility.hpp"
 
@@ -35,7 +35,7 @@ auto get_instrument_id_from_opaque(auto opaque) {
 Shared::Shared() : session_id{create_session_id()} {
   log::info(
       "session_id={}"sv,
-      debug::hex::Message{std::span{reinterpret_cast<std::byte const *>(&session_id), sizeof(session_id)}});
+      utils::debug::hex::Message{std::span{reinterpret_cast<std::byte const *>(&session_id), sizeof(session_id)}});
 }
 
 void Shared::operator()(Event<Disconnected> const &) {
