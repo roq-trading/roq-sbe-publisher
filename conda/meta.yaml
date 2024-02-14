@@ -25,8 +25,8 @@ requirements:
     - make
     - pkg-config
   host:
-    - libabseil
     - catch2
+    - libabseil
     - roq-cache
     - roq-client
     - roq-codec
