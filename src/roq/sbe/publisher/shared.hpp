@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <absl/container/flat_hash_map.h>
-
 #include "roq/api.hpp"
+
+#include "roq/utils/container.hpp"
 
 #include "roq/sbe/publisher/instrument.hpp"
 
@@ -70,7 +70,7 @@ struct Shared final {
   bool ready_ = {};
 
   uint16_t next_object_id_ = {};
-  absl::flat_hash_map<uint32_t, Instrument> instruments_;
+  utils::unordered_map<uint32_t, Instrument> instruments_;
 };
 
 }  // namespace publisher

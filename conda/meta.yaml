@@ -35,6 +35,7 @@ requirements:
     - roq-io
     - roq-oss-benchmark
     - roq-oss-tomlplusplus
+    - roq-oss-unordered_dense
 
 about:
   home: https://roq-trading.com
