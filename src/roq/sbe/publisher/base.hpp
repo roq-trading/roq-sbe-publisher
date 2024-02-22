@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <span>
+
 #include "roq/io/context.hpp"
 
 #include "roq/io/net/udp/sender.hpp"
@@ -22,7 +24,12 @@ struct Base : public io::net::udp::Sender::Handler {
   uint32_t get_sequence_number() const { return sequence_number_; }
 
  protected:
-  Base(Settings const &, io::Context &, Shared &, std::string_view const &multicast_address, uint16_t multicast_port);
+  Base(
+      Settings const &,
+      io::Context &,
+      Shared &,
+      std::span<std::string const> const &multicast_address,
+      uint16_t multicast_port);
 
   // io::net::udp::Sender::Handler
   void operator()(io::net::udp::Sender::Error const &) override;
@@ -40,7 +47,7 @@ struct Base : public io::net::udp::Sender::Handler {
 
  private:
   Shared const &shared_;
-  std::unique_ptr<io::Sender> sender_;
+  std::vector<std::unique_ptr<io::Sender>> sender_;
   uint32_t sequence_number_ = {};
 };
 

@@ -27,7 +27,12 @@ constexpr auto const MAX_PAYLOAD_SIZE = size_t{1400};
 // === HELPERS ===
 
 namespace {
-auto create_sender(auto &handler, auto &settings, auto &context, auto &multicast_address, auto multicast_port) {
+template <typename R>
+R create_sender(auto &handler, auto &settings, auto &context, auto &multicast_address, auto multicast_port) {
+  using result_type = std::decay<R>::type;
+  result_type result;
+  if (std::empty(settings.local_interface))
+    log::fatal("Unexpected: local_interface is missing"sv);
   if (!multicast_port)
     log::fatal("Unexpected: port is missing"sv);
   auto socket_options = Mask{
@@ -35,24 +40,30 @@ auto create_sender(auto &handler, auto &settings, auto &context, auto &multicast
       io::SocketOption::REUSE_PORT,
   };
   if (std::empty(multicast_address)) {
-    log::warn(R"(Using UDP (local_interface="{}", port={}))"sv, settings.local_interface, multicast_port);
-    auto network_address = io::NetworkAddress::create_blocking(settings.local_interface, multicast_port);
-    return context.create_udp_sender(handler, network_address, socket_options);
+    for (auto &item : settings.local_interface) {
+      log::warn(R"(Using UDP (local_interface="{}", port={}))"sv, item, multicast_port);
+      auto network_address = io::NetworkAddress::create_blocking(item, multicast_port);
+      auto sender = context.create_udp_sender(handler, network_address, socket_options);
+      result.emplace_back(std::move(sender));
+    }
   } else {
-    log::warn(
-        R"(Using multicast (local_interface="{}", port={}, multicast_address="{}"))"sv,
-        settings.local_interface,
-        multicast_port,
-        multicast_address);
-    auto network_address = io::NetworkAddress::create_blocking(multicast_address, multicast_port);
-    return context.create_multicast_sender(
-        handler,
-        network_address,
-        socket_options,
-        settings.local_interface,
-        settings.multicast_ttl,
-        settings.multicast_loop);
+    if (std::size(settings.local_interface) > 1 && std::size(settings.local_interface) != std::size(multicast_address))
+      log::fatal("Unexpected: len(local_interface) != len(multicast_address)"sv);
+    for (size_t i = 0; i < std::size(multicast_address); ++i) {
+      auto &local_interface_2 = settings.local_interface[i % std::size(settings.local_interface)];
+      auto &multicast_address_2 = multicast_address[i];
+      log::warn(
+          R"(Using multicast (local_interface="{}", port={}, multicast_address="{}"))"sv,
+          local_interface_2,
+          multicast_port,
+          multicast_address_2);
+      auto network_address = io::NetworkAddress::create_blocking(multicast_address_2, multicast_port);
+      auto sender = context.create_multicast_sender(
+          handler, network_address, socket_options, local_interface_2, settings.multicast_ttl, settings.multicast_loop);
+      result.emplace_back(std::move(sender));
+    }
   }
+  return result;
 }
 }  // namespace
 
@@ -62,10 +73,10 @@ Base::Base(
     Settings const &settings,
     io::Context &context,
     Shared &shared,
-    std::string_view const &multicast_address,
+    std::span<std::string const> const &multicast_address,
     uint16_t multicast_port)
     : encode_buffer_(settings.encode_buffer_size), shared_{shared},
-      sender_{create_sender(*this, settings, context, multicast_address, multicast_port)} {
+      sender_{create_sender<decltype(sender_)>(*this, settings, context, multicast_address, multicast_port)} {
 }
 
 // io::net::udp::Sender::Handler
@@ -107,9 +118,10 @@ void Base::send(
         utils::debug::hex::Message{payload_2});
     std::span header_2{reinterpret_cast<std::byte const *>(&header), sizeof(header)};
     std::array<std::span<std::byte const>, 2> message{{header_2, payload_2}};
-    auto bytes = (*sender_).send(message);
-    if (!bytes) {
-      log::warn("DROP sequence_number={}, bytes={}"sv, sequence_number_, bytes);
+    for (auto &sender : sender_) {
+      auto bytes = (*sender).send(message);
+      if (!bytes)
+        log::warn("DROP sequence_number={}, bytes={}"sv, sequence_number_, bytes);
     }
   }
 }

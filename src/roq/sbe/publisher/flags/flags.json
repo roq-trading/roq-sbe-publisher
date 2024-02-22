@@ -11,12 +11,12 @@
     },
     {
       "name": "local_interface",
-      "type": "std::string",
+      "type": "std::vector<std::string>",
       "description": "UDP publish address"
     },
     {
       "name": "multicast_address_snapshot",
-      "type": "std::string",
+      "type": "std::vector<std::string>",
       "description": "UDP publish address"
     },
     {
@@ -26,7 +26,7 @@
     },
     {
       "name": "multicast_address_incremental",
-      "type": "std::string",
+      "type": "std::vector<std::string>",
       "description": "UDP publish address"
     },
     {
