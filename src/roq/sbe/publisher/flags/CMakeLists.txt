@@ -6,19 +6,23 @@ set(NAMESPACE "roq/sbe/publisher/flags")
 
 set(AUTOGEN_SCHEMAS flags.json)
 
-roq_autodoc(
-  OUTPUT
-  AUTOGEN_DOC
-  NAMESPACE
-  ${NAMESPACE}
-  OUTPUT_TYPE
-  "doc"
-  FILE_TYPE
-  "rstinc"
-  SOURCES
-  ${AUTOGEN_SCHEMAS})
+if(BUILD_DOCS)
 
-add_custom_target(flags-autogen-doc ALL DEPENDS ${AUTOGEN_DOC})
+  roq_autodoc(
+    OUTPUT
+    AUTOGEN_DOC
+    NAMESPACE
+    ${NAMESPACE}
+    OUTPUT_TYPE
+    "doc"
+    SOURCES
+    ${AUTOGEN_SCHEMAS})
+
+  add_custom_target(flags-autogen-doc ALL DEPENDS ${AUTOGEN_DOC})
+
+  roq_allflags(OUTPUT "flags.rstinc" SOURCES ${AUTOGEN_DOC})
+
+endif()
 
 roq_autogen(
   OUTPUT
