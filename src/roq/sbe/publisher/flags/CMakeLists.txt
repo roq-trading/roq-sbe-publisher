@@ -18,6 +18,8 @@ roq_autodoc(
   SOURCES
   ${AUTOGEN_SCHEMAS})
 
+add_custom_target(flags-autogen-doc ALL DEPENDS ${AUTOGEN_DOC})
+
 roq_autogen(
   OUTPUT
   AUTOGEN_HEADERS
@@ -61,11 +63,13 @@ target_link_libraries(${TARGET_NAME} absl::flags)
 
 # install
 
-set(TARGET_DIR ${CMAKE_INSTALL_DATADIR}/doc/${PROJECT_NAME})
+if(BUILD_DOCS)
 
-install(
-  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
-  DESTINATION ${TARGET_DIR}/rst
-  FILES_MATCHING
-  PATTERN "*.rstinc"
-  PATTERN "CMakeFiles" EXCLUDE)
+  install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/${PROJECT_NAME}/rst
+    FILES_MATCHING
+    PATTERN "*.rstinc"
+    PATTERN "CMakeFiles" EXCLUDE)
+
+endif()

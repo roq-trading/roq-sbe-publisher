@@ -55,6 +55,8 @@ if(BUILD_TESTING)
   find_package(Catch2 REQUIRED)
 endif()
 
+option(BUILD_DOCS "Enable documentation" OFF)
+
 # include
 
 include_directories(

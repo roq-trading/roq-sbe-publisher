@@ -7,7 +7,7 @@
       "type": "std::string",
       "validator": "roq::flags::validators::Path",
       "required": true,
-      "description": "config file (path)"
+      "description": "Config file"
     },
     {
       "name": "local_interface",
@@ -51,13 +51,13 @@
       "type": "std::chrono::nanoseconds",
       "validator": "roq::flags::validators::TimePeriod",
       "default": "1s",
-      "description": "snapshot publish frequency"
+      "description": "Snapshot publish frequency"
     },
     {
       "name": "encode_buffer_size",
       "type": "uint32_t",
       "default": 1048576,
-      "description": "encode buffer size"
+      "description": "Encode buffer size"
     },
     {
       "name": "max_depth",
