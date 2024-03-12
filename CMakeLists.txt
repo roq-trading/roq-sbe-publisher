@@ -55,8 +55,6 @@ if(BUILD_TESTING)
   find_package(Catch2 REQUIRED)
 endif()
 
-option(BUILD_DOCS "Enable documentation" OFF)
-
 # include
 
 include_directories(
@@ -74,3 +72,12 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/share/ DESTINATION ${CMAKE_INSTALL_DATADIR
 
 install(FILES ${CMAKE_SOURCE_DIR}/CHANGELOG.md
         DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/${PROJECT_NAME})
+
+# docs
+
+option(BUILD_DOCS "Enable documentation" OFF)
+
+if(BUILD_DOCS)
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/share/
+          DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/${PROJECT_NAME})
+endif()

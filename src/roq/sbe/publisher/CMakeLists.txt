@@ -44,3 +44,14 @@ endif()
 target_compile_definitions(${TARGET_NAME} PRIVATE ROQ_PACKAGE_NAME="${PROJECT_NAME}")
 
 install(TARGETS ${TARGET_NAME})
+
+if(BUILD_DOCS)
+
+  install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/${PROJECT_NAME}
+    FILES_MATCHING
+    PATTERN "*.rst*"
+    PATTERN "CMakeFiles" EXCLUDE)
+
+endif()
