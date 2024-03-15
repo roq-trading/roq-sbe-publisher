@@ -4,6 +4,8 @@ All notable changes will be documented in this file.
 
 ## Head
 
+## 1.0.0 &ndash; 2024-03-16
+
 ### Changed
 
 * Make it possible to publish the same message multiple times (#443)
