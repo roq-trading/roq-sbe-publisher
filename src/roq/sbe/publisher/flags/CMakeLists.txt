@@ -4,7 +4,7 @@ include(RoqAutogen)
 
 set(NAMESPACE "roq/sbe/publisher/flags")
 
-set(AUTOGEN_SCHEMAS flags.json)
+set(AUTOGEN_SCHEMAS flags.json multicast.json)
 
 if(BUILD_DOCS)
 

@@ -1,5 +1,8 @@
 !!! THIS FILE HAS BEEN AUTO-GENERATED !!!
 roq-sbe-publisher-flags
 flags.rstinc
+multicast.rstinc
 flags.hpp
+multicast.hpp
 flags.cpp
+multicast.cpp

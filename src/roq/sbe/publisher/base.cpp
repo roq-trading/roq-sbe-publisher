@@ -21,7 +21,7 @@ namespace publisher {
 // === CONSTANTS ===
 
 namespace {
-constexpr auto const MAX_PAYLOAD_SIZE = size_t{1400};
+constexpr auto const MAX_PAYLOAD_SIZE = 1400uz;
 }  // namespace
 
 // === HELPERS ===
@@ -31,7 +31,7 @@ template <typename R>
 R create_sender(auto &handler, auto &settings, auto &context, auto &multicast_address, auto multicast_port) {
   using result_type = std::decay<R>::type;
   result_type result;
-  if (std::empty(settings.local_interface))
+  if (std::empty(settings.multicast.local_interface))
     log::fatal("Unexpected: local_interface is missing"sv);
   if (!multicast_port)
     log::fatal("Unexpected: port is missing"sv);
@@ -40,17 +40,18 @@ R create_sender(auto &handler, auto &settings, auto &context, auto &multicast_ad
       io::SocketOption::REUSE_PORT,
   };
   if (std::empty(multicast_address)) {
-    for (auto &item : settings.local_interface) {
+    for (auto &item : settings.multicast.local_interface) {
       log::warn(R"(Using UDP (local_interface="{}", port={}))"sv, item, multicast_port);
       auto network_address = io::NetworkAddress::create_blocking(item, multicast_port);
       auto sender = context.create_udp_sender(handler, network_address, socket_options);
       result.emplace_back(std::move(sender));
     }
   } else {
-    if (std::size(settings.local_interface) > 1 && std::size(settings.local_interface) != std::size(multicast_address))
+    if (std::size(settings.multicast.local_interface) > 1 &&
+        std::size(settings.multicast.local_interface) != std::size(multicast_address))
       log::fatal("Unexpected: len(local_interface) != len(multicast_address)"sv);
     for (size_t i = 0; i < std::size(multicast_address); ++i) {
-      auto &local_interface_2 = settings.local_interface[i % std::size(settings.local_interface)];
+      auto &local_interface_2 = settings.multicast.local_interface[i % std::size(settings.multicast.local_interface)];
       auto &multicast_address_2 = multicast_address[i];
       log::warn(
           R"(Using multicast (local_interface="{}", port={}, multicast_address="{}"))"sv,
@@ -59,7 +60,12 @@ R create_sender(auto &handler, auto &settings, auto &context, auto &multicast_ad
           multicast_address_2);
       auto network_address = io::NetworkAddress::create_blocking(multicast_address_2, multicast_port);
       auto sender = context.create_multicast_sender(
-          handler, network_address, socket_options, local_interface_2, settings.multicast_ttl, settings.multicast_loop);
+          handler,
+          network_address,
+          socket_options,
+          local_interface_2,
+          settings.multicast.multicast_ttl,
+          settings.multicast.multicast_loop);
       result.emplace_back(std::move(sender));
     }
   }

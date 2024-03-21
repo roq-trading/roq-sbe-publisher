@@ -10,6 +10,7 @@
 #include "roq/client/flags/settings.hpp"
 
 #include "roq/sbe/publisher/flags/flags.hpp"
+#include "roq/sbe/publisher/flags/multicast.hpp"
 
 namespace roq {
 namespace sbe {
@@ -17,6 +18,8 @@ namespace publisher {
 
 struct Settings final : public client::flags::Settings, public flags::Flags {
   explicit Settings(args::Parser const &);
+
+  flags::Multicast multicast;
 };
 
 }  // namespace publisher
@@ -32,9 +35,11 @@ struct fmt::formatter<roq::sbe::publisher::Settings> {
         context.out(),
         R"({{)"
         R"(client={}, )"
-        R"(flags={})"
+        R"(flags={}, )"
+        R"(multicast={})"
         R"(}})"sv,
         static_cast<roq::client::Settings2 const &>(value),
-        static_cast<roq::sbe::publisher::flags::Flags const &>(value));
+        static_cast<roq::sbe::publisher::flags::Flags const &>(value),
+        value.multicast);
   }
 };

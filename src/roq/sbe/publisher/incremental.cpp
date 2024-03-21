@@ -16,13 +16,13 @@ namespace publisher {
 
 namespace {
 auto const CONTROL = codec::udp::pack(codec::udp::Encoding::SBE, codec::udp::Channel::INCREMENTAL);
-auto const MAX_DEPTH = 1024 * 1024;
+auto const MAX_DEPTH = 1048576uz;
 }  // namespace
 
 // === IMPLEMENTATION ===
 
 Incremental::Incremental(Settings const &settings, io::Context &context, Shared &shared)
-    : Base{settings, context, shared, settings.multicast_address_incremental, settings.multicast_port_incremental},
+    : Base{settings, context, shared, settings.multicast.multicast_address_incremental, settings.multicast.multicast_port_incremental},
       encoder_{codec::sbe::Encoder::create()}, max_depth_{settings.max_depth}, bids_(MAX_DEPTH), asks_(MAX_DEPTH) {
 }
 
