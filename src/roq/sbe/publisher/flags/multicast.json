@@ -4,38 +4,41 @@
   "values": [
     {
       "name": "local_interface",
-      "type": "std::vector<std::string>",
+      "type": "std/string",
+      "array": "std/vector",
       "description": "UDP publish address"
     },
     {
       "name": "multicast_address_snapshot",
-      "type": "std::vector<std::string>",
+      "type": "std/string",
+      "array": "std/vector",
       "description": "UDP publish address"
     },
     {
       "name": "multicast_port_snapshot",
-      "type": "uint16_t",
+      "type": "std/uint16",
       "description": "UDP publish port"
     },
     {
       "name": "multicast_address_incremental",
-      "type": "std::vector<std::string>",
+      "type": "std/string",
+      "array": "std/vector",
       "description": "UDP publish address"
     },
     {
       "name": "multicast_port_incremental",
-      "type": "uint16_t",
+      "type": "std/uint16",
       "description": "UDP publish port"
     },
     {
       "name": "multicast_ttl",
-      "type": "uint16_t",
+      "type": "std/uint16",
       "default": 4,
       "description": "UDP publish ttl"
     },
     {
       "name": "multicast_loop",
-      "type": "bool",
+      "type": "std/bool",
       "default": false,
       "description": "UDP publish loop"
     }
