@@ -1,5 +1,5 @@
 {
-  "name": "Multicast",
+  "name": "roq/sbe/publisher/flags/Multicast",
   "type": "flags",
   "values": [
     {
