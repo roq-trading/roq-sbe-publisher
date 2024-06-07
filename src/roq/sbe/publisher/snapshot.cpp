@@ -24,8 +24,7 @@ auto const CONTROL = codec::udp::pack(codec::udp::Encoding::SBE, codec::udp::Cha
 
 Snapshot::Snapshot(Settings const &settings, io::Context &context, Shared &shared)
     : Base{settings, context, shared, settings.multicast.multicast_address_snapshot, settings.multicast.multicast_port_snapshot},
-      publish_freq_{settings.snapshot_publish_freq}, shared_{shared}, encoder_{codec::sbe::Encoder::create()},
-      max_depth_{settings.max_depth} {
+      publish_freq_{settings.snapshot_publish_freq}, shared_{shared}, encoder_{codec::sbe::Encoder::create()}, max_depth_{settings.max_depth} {
 }
 
 void Snapshot::operator()(Event<Timer> const &event) {

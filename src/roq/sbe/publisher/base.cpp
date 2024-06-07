@@ -47,25 +47,15 @@ R create_sender(auto &handler, auto &settings, auto &context, auto &multicast_ad
       result.emplace_back(std::move(sender));
     }
   } else {
-    if (std::size(settings.multicast.local_interface) > 1 &&
-        std::size(settings.multicast.local_interface) != std::size(multicast_address))
+    if (std::size(settings.multicast.local_interface) > 1 && std::size(settings.multicast.local_interface) != std::size(multicast_address))
       log::fatal("Unexpected: len(local_interface) != len(multicast_address)"sv);
     for (size_t i = 0; i < std::size(multicast_address); ++i) {
       auto &local_interface_2 = settings.multicast.local_interface[i % std::size(settings.multicast.local_interface)];
       auto &multicast_address_2 = multicast_address[i];
-      log::warn(
-          R"(Using multicast (local_interface="{}", port={}, multicast_address="{}"))"sv,
-          local_interface_2,
-          multicast_port,
-          multicast_address_2);
+      log::warn(R"(Using multicast (local_interface="{}", port={}, multicast_address="{}"))"sv, local_interface_2, multicast_port, multicast_address_2);
       auto network_address = io::NetworkAddress::create_blocking(multicast_address_2, multicast_port);
       auto sender = context.create_multicast_sender(
-          handler,
-          network_address,
-          socket_options,
-          local_interface_2,
-          settings.multicast.multicast_ttl,
-          settings.multicast.multicast_loop);
+          handler, network_address, socket_options, local_interface_2, settings.multicast.multicast_ttl, settings.multicast.multicast_loop);
       result.emplace_back(std::move(sender));
     }
   }
@@ -75,12 +65,7 @@ R create_sender(auto &handler, auto &settings, auto &context, auto &multicast_ad
 
 // === IMPLEMENTATION ===
 
-Base::Base(
-    Settings const &settings,
-    io::Context &context,
-    Shared &shared,
-    std::span<std::string const> const &multicast_address,
-    uint16_t multicast_port)
+Base::Base(Settings const &settings, io::Context &context, Shared &shared, std::span<std::string const> const &multicast_address, uint16_t multicast_port)
     : encode_buffer_(settings.encode_buffer_size), shared_{shared},
       sender_{create_sender<decltype(sender_)>(*this, settings, context, multicast_address, multicast_port)} {
 }
@@ -93,12 +78,7 @@ void Base::operator()(io::net::udp::Sender::Error const &) {
 
 // utilities
 
-void Base::send(
-    std::span<std::byte const> const &payload,
-    uint8_t control,
-    uint8_t object_type,
-    uint16_t object_id,
-    uint32_t last_sequence_number) {
+void Base::send(std::span<std::byte const> const &payload, uint8_t control, uint8_t object_type, uint16_t object_id, uint32_t last_sequence_number) {
   auto total_fragments = utils::round_up<MAX_PAYLOAD_SIZE>(std::size(payload)) / MAX_PAYLOAD_SIZE;
   auto fragment_number_max = std::max<size_t>(1, total_fragments) - 1;
   for (size_t index = 0; index < total_fragments; ++index) {
@@ -116,12 +96,7 @@ void Base::send(
         .last_sequence_number = last_sequence_number,
     };
     codec::udp::Encoder::encode(header);
-    log::info<1>(
-        "[{}:{}:{}] {}"sv,
-        sequence_number_,
-        header.fragment,
-        header.fragment_max,
-        utils::debug::hex::Message{payload_2});
+    log::info<1>("[{}:{}:{}] {}"sv, sequence_number_, header.fragment, header.fragment_max, utils::debug::hex::Message{payload_2});
     std::span header_2{reinterpret_cast<std::byte const *>(&header), sizeof(header)};
     std::array<std::span<std::byte const>, 2> message{{header_2, payload_2}};
     for (auto &sender : sender_) {

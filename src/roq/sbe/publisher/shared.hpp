@@ -33,8 +33,7 @@ struct Shared final {
   void operator()(MessageInfo const &);
 
   template <typename Callback>
-  void find_instrument_or_create(
-      uint64_t opaque, std::string_view const &exchange, std::string_view const &symbol, Callback callback) {
+  void find_instrument_or_create(uint64_t opaque, std::string_view const &exchange, std::string_view const &symbol, Callback callback) {
     auto &instrument = get_instrument(opaque, exchange, symbol);
     callback(instrument);
   }

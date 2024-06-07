@@ -33,9 +33,7 @@ auto get_instrument_id_from_opaque(auto opaque) {
 // === IMPLEMENTATION ===
 
 Shared::Shared() : session_id{create_session_id()} {
-  log::info(
-      "session_id={}"sv,
-      utils::debug::hex::Message{std::span{reinterpret_cast<std::byte const *>(&session_id), sizeof(session_id)}});
+  log::info("session_id={}"sv, utils::debug::hex::Message{std::span{reinterpret_cast<std::byte const *>(&session_id), sizeof(session_id)}});
 }
 
 void Shared::operator()(Event<Disconnected> const &) {

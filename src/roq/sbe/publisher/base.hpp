@@ -24,24 +24,14 @@ struct Base : public io::net::udp::Sender::Handler {
   uint32_t get_sequence_number() const { return sequence_number_; }
 
  protected:
-  Base(
-      Settings const &,
-      io::Context &,
-      Shared &,
-      std::span<std::string const> const &multicast_address,
-      uint16_t multicast_port);
+  Base(Settings const &, io::Context &, Shared &, std::span<std::string const> const &multicast_address, uint16_t multicast_port);
 
   // io::net::udp::Sender::Handler
   void operator()(io::net::udp::Sender::Error const &) override;
 
   // utilities
 
-  void send(
-      std::span<std::byte const> const &payload,
-      uint8_t control,
-      uint8_t object_type,
-      uint16_t object_id,
-      uint32_t last_sequence_number);
+  void send(std::span<std::byte const> const &payload, uint8_t control, uint8_t object_type, uint16_t object_id, uint32_t last_sequence_number);
 
   std::vector<std::byte> encode_buffer_;
 

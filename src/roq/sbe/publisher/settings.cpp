@@ -10,8 +10,7 @@ namespace roq {
 namespace sbe {
 namespace publisher {
 
-Settings::Settings(args::Parser const &args)
-    : client::flags::Settings{args}, flags::Flags{flags::Flags::create()}, multicast{flags::Multicast::create()} {
+Settings::Settings(args::Parser const &args) : client::flags::Settings{args}, flags::Flags{flags::Flags::create()}, multicast{flags::Multicast::create()} {
   log::info("settings={}"sv, *this);
 }
 

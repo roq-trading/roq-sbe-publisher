@@ -31,10 +31,8 @@ struct Context final {
 
 // === IMPLEMENTATION ===
 
-Instrument::Instrument(
-    uint32_t instrument_id, uint16_t object_id, std::string_view const &exchange, std::string_view const &symbol)
-    : instrument_id{instrument_id}, object_id{object_id}, exchange{exchange}, symbol{symbol},
-      market_by_price_{create_market_by_price(exchange, symbol)} {
+Instrument::Instrument(uint32_t instrument_id, uint16_t object_id, std::string_view const &exchange, std::string_view const &symbol)
+    : instrument_id{instrument_id}, object_id{object_id}, exchange{exchange}, symbol{symbol}, market_by_price_{create_market_by_price(exchange, symbol)} {
 }
 
 void Instrument::operator()(Event<ReferenceData> const &event, uint32_t sequence_number) {

@@ -74,12 +74,11 @@ void Controller::operator()(Event<StatisticsUpdate> const &event) {
 template <typename T>
 void Controller::dispatch(Event<T> const &event) {
   shared_(event.message_info);
-  shared_.find_instrument_or_create(
-      event.message_info.opaque, event.value.exchange, event.value.symbol, [&](auto &instrument) {
-        if (shared_.ready())
-          incremental_(instrument, event);
-        instrument(event, incremental_.get_sequence_number());  // note! *after* incremental
-      });
+  shared_.find_instrument_or_create(event.message_info.opaque, event.value.exchange, event.value.symbol, [&](auto &instrument) {
+    if (shared_.ready())
+      incremental_(instrument, event);
+    instrument(event, incremental_.get_sequence_number());  // note! *after* incremental
+  });
 }
 
 }  // namespace publisher
