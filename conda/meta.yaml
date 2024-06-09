@@ -37,7 +37,6 @@ requirements:
     - roq-oss-benchmark
     - roq-oss-tomlplusplus
     - roq-oss-unordered_dense
-    - roq-schema
 
 about:
   home: https://roq-trading.com
