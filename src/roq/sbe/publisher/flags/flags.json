@@ -5,14 +5,14 @@
     {
       "name": "config_file",
       "type": "std/string",
-      "validator": "roq::flags::validators::Path",
+      "validator": "roq/flags/validators/Path",
       "required": true,
       "description": "Config file"
     },
     {
       "name": "snapshot_publish_freq",
       "type": "std/nanoseconds",
-      "validator": "roq::flags::validators::TimePeriod",
+      "validator": "roq/flags/validators/TimePeriod",
       "default": "1s",
       "description": "Snapshot publish frequency"
     },
