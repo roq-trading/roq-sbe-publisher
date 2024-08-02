@@ -16,7 +16,6 @@ namespace sbe {
 namespace publisher {
 
 struct Base : public io::net::udp::Sender::Handler {
-  Base(Base &&) = default;
   Base(Base const &) = delete;
 
   bool ready() const { return shared_.ready(); }

@@ -15,7 +15,6 @@ namespace publisher {
 struct Shared final {
   Shared();
 
-  Shared(Shared &&) = default;
   Shared(Shared const &) = delete;
 
   uint16_t const session_id;

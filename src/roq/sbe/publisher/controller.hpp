@@ -19,7 +19,6 @@ namespace publisher {
 struct Controller final : public client::Handler {
   Controller(client::Dispatcher &, Settings const &, Config const &, io::Context &context);
 
-  Controller(Controller &&) = default;
   Controller(Controller const &) = delete;
 
  protected:
