@@ -18,6 +18,9 @@ namespace publisher {
 struct Instrument final {
   Instrument(uint32_t instrument_id, uint16_t object_id, std::string_view const &exchange, std::string_view const &symbol);
 
+  Instrument(Instrument &&) = default;
+  Instrument(Instrument const &) = delete;
+
   void operator()(Event<ReferenceData> const &, uint32_t sequence_number);
   void operator()(Event<MarketStatus> const &, uint32_t sequence_number);
   void operator()(Event<TopOfBook> const &, uint32_t sequence_number);

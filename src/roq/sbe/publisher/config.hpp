@@ -11,6 +11,9 @@ namespace sbe {
 namespace publisher {
 
 struct Config final : public client::Config {
+  Config(Config &&) = default;
+  Config(Config const &) = delete;
+
   static Config parse_file(std::string_view const &);
   static Config parse_text(std::string_view const &);
 
