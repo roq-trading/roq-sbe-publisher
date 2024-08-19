@@ -25,7 +25,7 @@ int Application::main(args::Parser const &args) {
     log::fatal("Unexpected"sv);
   Settings settings{args};
   auto config = Config::parse_file(settings.config_file);
-  auto context = io::engine::ContextFactory::create_libevent();
+  auto context = io::engine::ContextFactory::create();
   client::Bridge{settings, config, params}.dispatch<value_type>(settings, config, *context);
   return EXIT_SUCCESS;
 }
