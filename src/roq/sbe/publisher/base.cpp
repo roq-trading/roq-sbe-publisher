@@ -101,7 +101,7 @@ void Base::send(std::span<std::byte const> const &payload, uint8_t control, uint
     std::span header_2{reinterpret_cast<std::byte const *>(&header), sizeof(header)};
     std::array<std::span<std::byte const>, 2> message{{header_2, payload_2}};
     for (auto &sender : sender_) {
-      (*sender).send_with_completion([&](auto &buffer) {
+      (*sender).send([&](auto &buffer) {
         auto length = std::size(message[0]) + std::size(message[1]);
         if (std::size(buffer) < length) [[unlikely]]
           log::fatal("Unexpected: {} < {}"sv, std::size(buffer), length);
