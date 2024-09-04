@@ -27,13 +27,16 @@ requirements:
     - roq-autogen
   host:
     - catch2
+    - fmt
     - libabseil
+    - roq-api
     - roq-cache
     - roq-client
     - roq-codec
     - roq-core
     - roq-flags
     - roq-io
+    - roq-logging
     - roq-oss-benchmark
     - roq-oss-tomlplusplus
     - roq-oss-unordered_dense

@@ -33,6 +33,7 @@ find_package(roq-flags REQUIRED)
 find_package(roq-io REQUIRED)
 find_package(roq-logging REQUIRED)
 find_package(tomlplusplus REQUIRED)
+find_package(magic_enum REQUIRED)
 find_package(unordered_dense REQUIRED)
 
 if(UNIX AND NOT APPLE)
