@@ -36,12 +36,6 @@ find_package(roq-logging REQUIRED)
 find_package(tomlplusplus REQUIRED)
 find_package(unordered_dense REQUIRED)
 
-if(UNIX AND NOT APPLE)
-  set(RT_LIBRARIES rt)
-else()
-  set(RT_LIBRARIES)
-endif()
-
 find_package(PkgConfig REQUIRED)
 find_package(Catch2 REQUIRED)
 
