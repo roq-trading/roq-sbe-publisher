@@ -20,7 +20,7 @@ build:
 requirements:
   build:
     - {{ compiler('cxx') }}
-    - clangdev
+    - clang-format
     - cmake
     - make
     - pkg-config
