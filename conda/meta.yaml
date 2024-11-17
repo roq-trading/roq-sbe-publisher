@@ -23,11 +23,13 @@ requirements:
     - catch2
     - fmt
     - libabseil
+    - roq-algo
     - roq-api
     - roq-cache
     - roq-client
     - roq-codec
     - roq-core
+    - roq-fix
     - roq-flags
     - roq-io
     - roq-logging
@@ -35,6 +37,7 @@ requirements:
     - roq-oss-magic_enum
     - roq-oss-tomlplusplus
     - roq-oss-unordered_dense
+    - roq-utils
 
 about:
   home: https://roq-trading.com

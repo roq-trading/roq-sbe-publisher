@@ -21,17 +21,17 @@ add_dependencies(${TARGET_NAME} ${TARGET_NAME}-flags-autogen-headers)
 target_link_libraries(
   ${TARGET_NAME}
   PRIVATE ${TARGET_NAME}-flags
+          roq-api::roq-api
+          roq-cache::roq-cache
           roq-client::roq-client
           roq-client::roq-client-flags
-          roq-io::roq-io
           roq-codec::roq-codec
-          roq-cache::roq-cache
+          roq-flags::roq-flags
+          roq-io::roq-io
           roq-logging::roq-logging
           roq-logging::roq-logging-flags
-          roq-flags::roq-flags
-          roq-api::roq-api
-          unordered_dense::unordered_dense
-          fmt::fmt)
+          fmt::fmt
+          unordered_dense::unordered_dense)
 
 if(ROQ_BUILD_TYPE STREQUAL "Release")
   set_target_properties(${TARGET_NAME} PROPERTIES LINK_FLAGS_RELEASE -s)
