@@ -16,6 +16,8 @@ requirements:
     - {{ compiler('cxx') }}
     - clang-format
     - cmake
+    - coreutils                                                                                                                                                    
+    - git
     - make
     - pkg-config
     - roq-autogen
