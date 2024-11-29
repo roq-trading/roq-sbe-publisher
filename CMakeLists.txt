@@ -16,6 +16,10 @@ include(GetGitRepoVersion)
 
 project(roq-sbe-publisher)
 
+# language
+
+enable_language(CXX)
+
 # filesystem
 
 include(GNUInstallDirs)
