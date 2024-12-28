@@ -19,7 +19,7 @@ Conda
   
   .. code-block:: bash
   
-    $ mamba install \
+    $ conda install \
       --channel https://roq-trading.com/conda/stable \
       roq-sbe-publisher
   
