@@ -12,14 +12,13 @@
 
 #include "roq/codec/sbe/encoder.hpp"
 
-#include "roq/sbe/publisher/base.hpp"
-#include "roq/sbe/publisher/instrument.hpp"
-#include "roq/sbe/publisher/settings.hpp"
-#include "roq/sbe/publisher/shared.hpp"
+#include "roq/sbe_publisher/base.hpp"
+#include "roq/sbe_publisher/instrument.hpp"
+#include "roq/sbe_publisher/settings.hpp"
+#include "roq/sbe_publisher/shared.hpp"
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 struct Snapshot final : public Base {
   Snapshot(Settings const &, io::Context &context, Shared &);
@@ -39,6 +38,5 @@ struct Snapshot final : public Base {
   std::vector<MBPUpdate> bids_, asks_;
 };
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

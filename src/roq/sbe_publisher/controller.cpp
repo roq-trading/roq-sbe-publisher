@@ -1,14 +1,13 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/sbe/publisher/controller.hpp"
+#include "roq/sbe_publisher/controller.hpp"
 
 #include "roq/logging.hpp"
 
 using namespace std::literals;
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 // === IMPLEMENTATION ===
 
@@ -81,6 +80,5 @@ void Controller::dispatch(Event<T> const &event) {
   });
 }
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

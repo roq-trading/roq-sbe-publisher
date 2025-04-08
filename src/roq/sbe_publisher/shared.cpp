@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/sbe/publisher/shared.hpp"
+#include "roq/sbe_publisher/shared.hpp"
 
 #include "roq/logging.hpp"
 
@@ -13,8 +13,7 @@
 using namespace std::literals;
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 // === HELPERS ===
 
@@ -68,6 +67,5 @@ Instrument &Shared::get_instrument(uint64_t opaque, std::string_view const &exch
   return (*iter).second;
 }
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

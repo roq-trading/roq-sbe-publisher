@@ -7,8 +7,7 @@
 #include "roq/client/config.hpp"
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 struct Config final : public client::Config {
   Config(Config const &) = delete;
@@ -25,6 +24,5 @@ struct Config final : public client::Config {
   utils::unordered_map<std::string, utils::unordered_set<std::string>> const symbols_;
 };
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

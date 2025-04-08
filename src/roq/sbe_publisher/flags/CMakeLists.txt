@@ -2,7 +2,7 @@ set(TARGET_NAME ${PROJECT_NAME}-flags)
 
 include(RoqAutogen)
 
-set(NAMESPACE "roq/sbe/publisher/flags")
+set(NAMESPACE "roq/sbe_publisher/flags")
 
 set(AUTOGEN_SCHEMAS flags.json multicast.json)
 

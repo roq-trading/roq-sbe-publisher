@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/sbe/publisher/instrument.hpp"
+#include "roq/sbe_publisher/instrument.hpp"
 
 #include "roq/client.hpp"
 
@@ -9,8 +9,7 @@
 using namespace std::literals;
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 // === HELPERS ===
 
@@ -102,6 +101,5 @@ Instrument::operator StatisticsUpdate() const {
   return statistics_.convert(context);
 }
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

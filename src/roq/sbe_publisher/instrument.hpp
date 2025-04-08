@@ -12,8 +12,7 @@
 #include "roq/cache/statistics.hpp"
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 struct Instrument final {
   Instrument(uint32_t instrument_id, uint16_t object_id, std::string_view const &exchange, std::string_view const &symbol);
@@ -62,6 +61,5 @@ struct Instrument final {
   cache::Statistics statistics_;
 };
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

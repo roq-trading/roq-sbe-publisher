@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/sbe/publisher/application.hpp"
+#include "roq/sbe_publisher/application.hpp"
 
 #include <cassert>
 
@@ -8,14 +8,13 @@
 
 #include "roq/io/engine/context_factory.hpp"
 
-#include "roq/sbe/publisher/config.hpp"
-#include "roq/sbe/publisher/settings.hpp"
+#include "roq/sbe_publisher/config.hpp"
+#include "roq/sbe_publisher/settings.hpp"
 
 using namespace std::literals;
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 // === IMPLEMENTATION ===
 
@@ -30,6 +29,5 @@ int Application::main(args::Parser const &args) {
   return EXIT_SUCCESS;
 }
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

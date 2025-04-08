@@ -6,15 +6,14 @@
 
 #include "roq/io/context.hpp"
 
-#include "roq/sbe/publisher/config.hpp"
-#include "roq/sbe/publisher/incremental.hpp"
-#include "roq/sbe/publisher/settings.hpp"
-#include "roq/sbe/publisher/shared.hpp"
-#include "roq/sbe/publisher/snapshot.hpp"
+#include "roq/sbe_publisher/config.hpp"
+#include "roq/sbe_publisher/incremental.hpp"
+#include "roq/sbe_publisher/settings.hpp"
+#include "roq/sbe_publisher/shared.hpp"
+#include "roq/sbe_publisher/snapshot.hpp"
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 struct Controller final : public client::Handler {
   Controller(client::Dispatcher &, Settings const &, Config const &, io::Context &context);
@@ -47,6 +46,5 @@ struct Controller final : public client::Handler {
   Snapshot snapshot_;
 };
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

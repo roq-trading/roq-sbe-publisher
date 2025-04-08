@@ -8,12 +8,11 @@
 
 #include "roq/io/net/udp/sender.hpp"
 
-#include "roq/sbe/publisher/settings.hpp"
-#include "roq/sbe/publisher/shared.hpp"
+#include "roq/sbe_publisher/settings.hpp"
+#include "roq/sbe_publisher/shared.hpp"
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 struct Base : public io::net::udp::Sender::Handler {
   Base(Base const &) = delete;
@@ -40,6 +39,5 @@ struct Base : public io::net::udp::Sender::Handler {
   uint32_t sequence_number_ = {};
 };
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

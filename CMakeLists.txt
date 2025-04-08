@@ -73,7 +73,7 @@ include_directories(
 
 # sub-projects
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/src)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/roq/sbe_publisher)
 
 if(BUILD_TESTING)
   add_subdirectory(${CMAKE_SOURCE_DIR}/test)

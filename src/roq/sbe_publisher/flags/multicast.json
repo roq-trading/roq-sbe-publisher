@@ -1,5 +1,5 @@
 {
-  "name": "roq/sbe/publisher/flags/Multicast",
+  "name": "roq/sbe_publisher/flags/Multicast",
   "type": "flags",
   "values": [
     {

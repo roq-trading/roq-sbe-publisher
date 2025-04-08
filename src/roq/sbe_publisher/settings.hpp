@@ -9,12 +9,11 @@
 
 #include "roq/client/flags/settings.hpp"
 
-#include "roq/sbe/publisher/flags/flags.hpp"
-#include "roq/sbe/publisher/flags/multicast.hpp"
+#include "roq/sbe_publisher/flags/flags.hpp"
+#include "roq/sbe_publisher/flags/multicast.hpp"
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 struct Settings final : public client::flags::Settings, public flags::Flags {
   explicit Settings(args::Parser const &);
@@ -22,14 +21,13 @@ struct Settings final : public client::flags::Settings, public flags::Flags {
   flags::Multicast multicast;
 };
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq
 
 template <>
-struct fmt::formatter<roq::sbe::publisher::Settings> {
+struct fmt::formatter<roq::sbe_publisher::Settings> {
   constexpr auto parse(format_parse_context &context) { return std::begin(context); }
-  auto format(roq::sbe::publisher::Settings const &value, format_context &context) const {
+  auto format(roq::sbe_publisher::Settings const &value, format_context &context) const {
     using namespace std::literals;
     return fmt::format_to(
         context.out(),
@@ -39,7 +37,7 @@ struct fmt::formatter<roq::sbe::publisher::Settings> {
         R"(multicast={})"
         R"(}})"sv,
         static_cast<roq::client::Settings2 const &>(value),
-        static_cast<roq::sbe::publisher::flags::Flags const &>(value),
+        static_cast<roq::sbe_publisher::flags::Flags const &>(value),
         value.multicast);
   }
 };

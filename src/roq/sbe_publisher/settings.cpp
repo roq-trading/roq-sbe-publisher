@@ -1,19 +1,17 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/sbe/publisher/settings.hpp"
+#include "roq/sbe_publisher/settings.hpp"
 
 #include "roq/logging.hpp"
 
 using namespace std::literals;
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 Settings::Settings(args::Parser const &args) : client::flags::Settings{args}, flags::Flags{flags::Flags::create()}, multicast{flags::Multicast::create()} {
   log::info("settings={}"sv, *this);
 }
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/sbe/publisher/incremental.hpp"
+#include "roq/sbe_publisher/incremental.hpp"
 
 #include "roq/logging.hpp"
 
@@ -9,8 +9,7 @@
 using namespace std::literals;
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 // === CONSTANTS ===
 
@@ -83,6 +82,5 @@ void Incremental::operator()(Instrument const &instrument, Event<StatisticsUpdat
   send(message, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.statistics);
 }
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

@@ -6,11 +6,10 @@
 
 #include "roq/utils/container.hpp"
 
-#include "roq/sbe/publisher/instrument.hpp"
+#include "roq/sbe_publisher/instrument.hpp"
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 struct Shared final {
   Shared();
@@ -71,6 +70,5 @@ struct Shared final {
   utils::unordered_map<uint32_t, Instrument> instruments_;
 };
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

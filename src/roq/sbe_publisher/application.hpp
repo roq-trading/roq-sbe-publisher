@@ -7,11 +7,10 @@
 
 #include "roq/service.hpp"
 
-#include "roq/sbe/publisher/controller.hpp"
+#include "roq/sbe_publisher/controller.hpp"
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 struct Application final : public Service {
   using Service::Service;  // inherit constructors
@@ -23,6 +22,5 @@ struct Application final : public Service {
   using value_type = Controller;  // note!
 };
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

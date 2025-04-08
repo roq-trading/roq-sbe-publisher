@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/sbe/publisher/config.hpp"
+#include "roq/sbe_publisher/config.hpp"
 
 #include <toml++/toml.h>
 
@@ -9,8 +9,7 @@
 using namespace std::literals;
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 // === HELPERS ===
 
@@ -123,6 +122,5 @@ Config Config::parse_text(std::string_view const &text) {
   return Config{root};
 }
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq

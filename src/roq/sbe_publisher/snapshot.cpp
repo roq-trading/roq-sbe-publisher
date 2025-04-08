@@ -1,18 +1,17 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/sbe/publisher/snapshot.hpp"
+#include "roq/sbe_publisher/snapshot.hpp"
 
 #include "roq/logging.hpp"
 
 #include "roq/codec/udp/header.hpp"
 
-#include "roq/sbe/publisher/shared.hpp"
+#include "roq/sbe_publisher/shared.hpp"
 
 using namespace std::literals;
 
 namespace roq {
-namespace sbe {
-namespace publisher {
+namespace sbe_publisher {
 
 // === CONSTANTS ===
 
@@ -94,6 +93,5 @@ void Snapshot::publish(Instrument const &instrument) {
   send(message_4, CONTROL, 0, instrument.object_id, instrument.last_sequence_number.statistics);
 }
 
-}  // namespace publisher
-}  // namespace sbe
+}  // namespace sbe_publisher
 }  // namespace roq
