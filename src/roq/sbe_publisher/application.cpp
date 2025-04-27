@@ -2,7 +2,7 @@
 
 #include "roq/sbe_publisher/application.hpp"
 
-#include <cassert>
+#include "roq/logging.hpp"
 
 #include "roq/client.hpp"
 
