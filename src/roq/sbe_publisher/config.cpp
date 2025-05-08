@@ -15,16 +15,18 @@ namespace sbe_publisher {
 
 namespace {
 void check_empty(auto &node) {
-  if (!node.is_table())
+  if (!node.is_table()) {
     return;
+  }
   auto &table = *node.as_table();
   auto error = false;
   for (auto &[key, value] : table) {
     log::warn(R"(key="{}")"sv, static_cast<std::string_view>(key));
     error = true;
   }
-  if (error)
+  if (error) {
     log::fatal("Unexpected"sv);
+  }
 }
 
 template <typename Callback>
@@ -35,8 +37,9 @@ bool find_and_remove(auto &node, std::string_view const &key, Callback callback)
   }
   auto &table = *node.as_table();
   auto iter = table.find(key);
-  if (iter == table.end())
+  if (iter == table.end()) {
     return false;
+  }
   callback((*iter).second);
   table.erase(iter);
   assert(table.find(key) == std::end(table));
@@ -50,8 +53,9 @@ void parse_symbols_helper(R &result, auto &node) {
     if (item.is_array()) {
       auto &symbols = result[""sv];
       auto array = *item.as_array();
-      for (auto &item : array)
+      for (auto &item : array) {
         symbols.emplace(*item.template value<std::string_view>());
+      }
     } else if (item.is_table()) {
       auto &symbols = result[key];
       auto table = *item.as_table();
@@ -61,8 +65,9 @@ void parse_symbols_helper(R &result, auto &node) {
             symbols.emplace(*item_2.template value<std::string_view>());
           } else if (item_2.is_array()) {
             auto array = *item_2.as_array();
-            for (auto &item_3 : array)
+            for (auto &item_3 : array) {
               symbols.emplace(*item_3.template value<std::string_view>());
+            }
           } else {
             log::fatal("Unexpected: regex must be value or array"sv);
           }
@@ -102,7 +107,7 @@ Config::Config(auto &node) : symbols_{parse_symbols<decltype(symbols_)>(node)} {
 }
 
 void Config::dispatch(Handler &handler) const {
-  for (auto &[exchange, symbols] : symbols_)
+  for (auto &[exchange, symbols] : symbols_) {
     for (auto &item : symbols) {
       auto symbol = client::Symbol{
           .regex = item,
@@ -110,6 +115,7 @@ void Config::dispatch(Handler &handler) const {
       };
       handler(symbol);
     }
+  }
 }
 
 Config Config::parse_file(std::string_view const &path) {

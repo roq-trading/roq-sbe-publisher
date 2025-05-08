@@ -48,10 +48,12 @@ struct Shared final {
 
   template <typename Callback>
   bool get_all_instruments(Callback callback) {
-    if (std::empty(instruments_))
+    if (std::empty(instruments_)) {
       return false;
-    for (auto &[_, instrument] : instruments_)
+    }
+    for (auto &[_, instrument] : instruments_) {
       callback(instrument);
+    }
     return true;
   }
 

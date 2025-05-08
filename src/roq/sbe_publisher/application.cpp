@@ -20,8 +20,9 @@ namespace sbe_publisher {
 
 int Application::main(args::Parser const &args) {
   auto params = args.params();
-  if (std::empty(params))
+  if (std::empty(params)) {
     log::fatal("Unexpected"sv);
+  }
   Settings settings{args};
   auto config = Config::parse_file(settings.config_file);
   auto context = io::engine::ContextFactory::create();

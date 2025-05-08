@@ -27,17 +27,20 @@ Snapshot::Snapshot(Settings const &settings, io::Context &context, Shared &share
 }
 
 void Snapshot::operator()(Event<Timer> const &event) {
-  if (!shared_.ready())  // XXX TODO maybe a latch instead so subsequent disconnects don't stop publishing?
+  if (!shared_.ready()) {  // XXX TODO maybe a latch instead so subsequent disconnects don't stop publishing?
     return;
+  }
   auto now = event.value.now;
-  if (now < next_publish_)
+  if (now < next_publish_) {
     return;
+  }
   next_publish_ = now + publish_freq_;
   while (true) {
     if (std::empty(publish_)) {
       shared_.get_all_instruments([&](auto &instrument) { publish_.emplace_back(instrument.instrument_id); });
-      if (std::empty(publish_))
+      if (std::empty(publish_)) {
         return;
+      }
     }
     assert(!std::empty(publish_));
     auto instrument_id = publish_.front();

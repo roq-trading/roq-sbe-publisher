@@ -30,10 +30,12 @@ template <typename R>
 R create_sender(auto &handler, auto &settings, auto &context, auto &multicast_address, auto multicast_port) {
   using result_type = std::decay<R>::type;
   result_type result;
-  if (std::empty(settings.multicast.local_interface))
+  if (std::empty(settings.multicast.local_interface)) {
     log::fatal("Unexpected: local_interface is missing"sv);
-  if (!multicast_port)
+  }
+  if (!multicast_port) {
     log::fatal("Unexpected: port is missing"sv);
+  }
   auto socket_options = Mask{
       io::SocketOption::REUSE_ADDRESS,
       io::SocketOption::REUSE_PORT,
@@ -46,8 +48,9 @@ R create_sender(auto &handler, auto &settings, auto &context, auto &multicast_ad
       result.emplace_back(std::move(sender));
     }
   } else {
-    if (std::size(settings.multicast.local_interface) > 1 && std::size(settings.multicast.local_interface) != std::size(multicast_address))
+    if (std::size(settings.multicast.local_interface) > 1 && std::size(settings.multicast.local_interface) != std::size(multicast_address)) {
       log::fatal("Unexpected: len(local_interface) != len(multicast_address)"sv);
+    }
     for (size_t i = 0; i < std::size(multicast_address); ++i) {
       auto &local_interface_2 = settings.multicast.local_interface[i % std::size(settings.multicast.local_interface)];
       auto &multicast_address_2 = multicast_address[i];
@@ -102,8 +105,9 @@ void Base::send(std::span<std::byte const> const &payload, uint8_t control, uint
     for (auto &sender : sender_) {
       if ((*sender).send([&](auto &buffer) {
             auto length = std::size(message[0]) + std::size(message[1]);
-            if (std::size(buffer) < length) [[unlikely]]
+            if (std::size(buffer) < length) [[unlikely]] {
               log::fatal("Unexpected: {} < {}"sv, std::size(buffer), length);
+            }
             std::memcpy(std::data(buffer), std::data(message[0]), std::size(message[0]));
             std::memcpy(std::data(buffer) + std::size(message[0]), std::data(message[1]), std::size(message[1]));
             return length;
