@@ -83,7 +83,7 @@ void parse_symbols_helper(R &result, auto &node) {
 
 template <typename R>
 R parse_symbols(auto &node) {
-  using result_type = std::remove_cvref<R>::type;
+  using result_type = std::remove_cvref_t<R>;
   result_type result;
   auto parse_helper = [&](auto &node) {
     if (node.is_table()) {

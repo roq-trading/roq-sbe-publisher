@@ -20,7 +20,7 @@ namespace sbe_publisher {
 // === CONSTANTS ===
 
 namespace {
-constexpr auto const MAX_PAYLOAD_SIZE = 1400uz;
+constexpr auto const MAX_PAYLOAD_SIZE = 1400UZ;
 }  // namespace
 
 // === HELPERS ===
@@ -28,7 +28,7 @@ constexpr auto const MAX_PAYLOAD_SIZE = 1400uz;
 namespace {
 template <typename R>
 R create_sender(auto &handler, auto &settings, auto &context, auto &multicast_address, auto multicast_port) {
-  using result_type = std::decay<R>::type;
+  using result_type = std::remove_cvref_t<R>;
   result_type result;
   if (std::empty(settings.multicast.local_interface)) {
     log::fatal("Unexpected: local_interface is missing"sv);
