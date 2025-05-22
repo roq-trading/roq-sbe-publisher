@@ -20,7 +20,7 @@ namespace sbe_publisher {
 // === CONSTANTS ===
 
 namespace {
-constexpr auto const MAX_PAYLOAD_SIZE = 1400UZ;
+constexpr auto const MAX_PAYLOAD_SIZE = 1400uz;
 }  // namespace
 
 // === HELPERS ===
