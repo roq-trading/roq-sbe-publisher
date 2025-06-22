@@ -26,12 +26,10 @@ Snapshot::Snapshot(Settings const &settings, io::Context &context, Shared &share
       publish_freq_{settings.snapshot_publish_freq}, shared_{shared}, encoder_{codec::sbe::Encoder::create()}, max_depth_{settings.max_depth} {
 }
 
-void Snapshot::operator()(Event<Timer> const &event) {
-  auto &[message_info, timer] = event;
+void Snapshot::refresh(std::chrono::nanoseconds now) {
   if (!shared_.ready()) {  // XXX TODO maybe a latch instead so subsequent disconnects don't stop publishing?
     return;
   }
-  auto now = timer.now;
   if (now < next_publish_) {
     return;
   }

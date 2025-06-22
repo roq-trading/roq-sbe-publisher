@@ -23,7 +23,7 @@ namespace sbe_publisher {
 struct Snapshot final : public Base {
   Snapshot(Settings const &, io::Context &context, Shared &);
 
-  void operator()(Event<Timer> const &);
+  void refresh(std::chrono::nanoseconds now);
 
  protected:
   void publish(Instrument const &);

@@ -53,11 +53,7 @@ void Controller::dispatch() {
 }
 
 void Controller::refresh(std::chrono::nanoseconds now) {
-  MessageInfo message_info;
-  auto timer = Timer{
-      .now = now,
-  };
-  create_event_and_dispatch(snapshot_, message_info, timer);
+  snapshot_.refresh(now);
 }
 
 // io::sys::Signal::Handler
