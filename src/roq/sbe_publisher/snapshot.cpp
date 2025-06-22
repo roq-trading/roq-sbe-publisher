@@ -27,10 +27,11 @@ Snapshot::Snapshot(Settings const &settings, io::Context &context, Shared &share
 }
 
 void Snapshot::operator()(Event<Timer> const &event) {
+  auto &[message_info, timer] = event;
   if (!shared_.ready()) {  // XXX TODO maybe a latch instead so subsequent disconnects don't stop publishing?
     return;
   }
-  auto now = event.value.now;
+  auto now = timer.now;
   if (now < next_publish_) {
     return;
   }

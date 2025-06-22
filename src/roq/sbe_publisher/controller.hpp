@@ -2,7 +2,9 @@
 
 #pragma once
 
-#include "roq/client.hpp"
+#include <memory>
+
+#include "roq/client/poller.hpp"
 
 #include "roq/io/context.hpp"
 
@@ -15,14 +17,20 @@
 namespace roq {
 namespace sbe_publisher {
 
-struct Controller final : public client::Handler {
-  Controller(client::Dispatcher &, Settings const &, Config const &, io::Context &context);
+struct Controller final : public io::sys::Signal::Handler, public client::Poller::Handler {
+  Controller(Settings const &, Config const &, io::Context &context, std::span<std::string_view const> const &params);
 
   Controller(Controller const &) = delete;
 
+  void dispatch();
+
  protected:
-  // client::Handler
-  void operator()(Event<Timer> const &) override;
+  void refresh(std::chrono::nanoseconds now);
+
+  // io::sys::Signal::Handler
+  void operator()(io::sys::Signal::Event const &) override;
+
+  // client::Poller::Handler
   void operator()(Event<Connected> const &) override;
   void operator()(Event<Disconnected> const &) override;
   void operator()(Event<DownloadBegin> const &) override;
@@ -41,9 +49,13 @@ struct Controller final : public client::Handler {
 
  private:
   io::Context &context_;
+  std::unique_ptr<io::sys::Signal> terminate_;
+  std::unique_ptr<io::sys::Signal> interrupt_;
+  std::unique_ptr<client::Poller> dispatcher_;
   Shared shared_;
   Incremental incremental_;
   Snapshot snapshot_;
+  std::chrono::nanoseconds next_yield_ = {};
 };
 
 }  // namespace sbe_publisher

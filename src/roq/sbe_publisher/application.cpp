@@ -4,11 +4,12 @@
 
 #include "roq/logging.hpp"
 
-#include "roq/client.hpp"
+#include "roq/client/poller.hpp"
 
 #include "roq/io/engine/context_factory.hpp"
 
 #include "roq/sbe_publisher/config.hpp"
+#include "roq/sbe_publisher/controller.hpp"
 #include "roq/sbe_publisher/settings.hpp"
 
 using namespace std::literals;
@@ -26,7 +27,7 @@ int Application::main(args::Parser const &args) {
   Settings settings{args};
   auto config = Config::parse_file(settings.config_file);
   auto context = io::engine::ContextFactory::create();
-  client::Bridge{settings, config, params}.dispatch<value_type>(settings, config, *context);
+  Controller{settings, config, *context, params}.dispatch();
   return EXIT_SUCCESS;
 }
 
