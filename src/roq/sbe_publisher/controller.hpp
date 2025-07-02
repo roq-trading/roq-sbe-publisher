@@ -8,6 +8,8 @@
 
 #include "roq/io/context.hpp"
 
+#include "roq/service/dispatcher.hpp"
+
 #include "roq/sbe_publisher/config.hpp"
 #include "roq/sbe_publisher/incremental.hpp"
 #include "roq/sbe_publisher/settings.hpp"
@@ -17,7 +19,7 @@
 namespace roq {
 namespace sbe_publisher {
 
-struct Controller final : public io::sys::Signal::Handler, public client::Poller::Handler {
+struct Controller final : public io::sys::Signal::Handler, public service::Dispatcher::Handler, public client::Poller::Handler {
   Controller(Settings const &, Config const &, io::Context &context, std::span<std::string_view const> const &params);
 
   Controller(Controller const &) = delete;
@@ -29,6 +31,12 @@ struct Controller final : public io::sys::Signal::Handler, public client::Poller
 
   // io::sys::Signal::Handler
   void operator()(io::sys::Signal::Event const &) override;
+
+  // service::Dispatcher::Handler
+  void operator()(metrics::Writer &) const override;
+  void operator()(service::Disconnected const &) override;
+  void operator()(service::Response &, service::Request const &) override;
+  void operator()(Control const &, uint8_t user_id) override;
 
   // client::Poller::Handler
   void operator()(Event<Connected> const &) override;
@@ -51,6 +59,7 @@ struct Controller final : public io::sys::Signal::Handler, public client::Poller
   io::Context &context_;
   std::unique_ptr<io::sys::Signal> terminate_;
   std::unique_ptr<io::sys::Signal> interrupt_;
+  std::unique_ptr<service::Dispatcher> service_;
   std::unique_ptr<client::Poller> dispatcher_;
   Shared shared_;
   Incremental incremental_;

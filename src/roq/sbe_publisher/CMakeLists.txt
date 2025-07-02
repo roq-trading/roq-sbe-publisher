@@ -30,6 +30,8 @@ target_link_libraries(
           roq-io::roq-io
           roq-logging::roq-logging
           roq-logging::roq-logging-flags
+          roq-service::roq-service
+          roq-web::roq-web
           fmt::fmt
           unordered_dense::unordered_dense)
 

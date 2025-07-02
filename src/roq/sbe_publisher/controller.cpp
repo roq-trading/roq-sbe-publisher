@@ -4,6 +4,8 @@
 
 #include "roq/logging.hpp"
 
+#include "roq/service/factory.hpp"
+
 using namespace std::literals;
 
 namespace roq {
@@ -21,6 +23,25 @@ auto const REFRESH_FREQ = 40ms;  // ~24 fps
 // === HELPERS ===
 
 namespace {
+auto create_service(auto &handler, auto &settings, auto &context) {
+  auto config = service::Config{
+      .package_name = ROQ_PACKAGE_NAME,
+      .build_number = {},
+      .name = {},
+      .config_hash = {},
+      .api = {},
+      .session_id = {},
+      .cache_dir = {},
+      .event_log_public_path = {},
+      .event_log_private_path = {},
+      .start_time = {},
+      .url_prefix = {},
+      .www_static_dir = {},
+      .session_timeout = {},
+  };
+  return service::Factory::create(handler, context, settings.service.listen_address, config);
+}
+
 auto create_dispatcher(auto &settings, auto &config, auto &context, auto &params) {
   return client::Poller::create(settings, config, context, params);
 }
@@ -30,8 +51,8 @@ auto create_dispatcher(auto &settings, auto &config, auto &context, auto &params
 
 Controller::Controller(Settings const &settings, Config const &config, io::Context &context, std::span<std::string_view const> const &params)
     : context_{context}, terminate_{context.create_signal(*this, io::sys::Signal::Type::TERMINATE)},
-      interrupt_{context.create_signal(*this, io::sys::Signal::Type::INTERRUPT)}, dispatcher_{create_dispatcher(settings, config, context, params)},
-      incremental_{settings, context, shared_}, snapshot_{settings, context, shared_} {
+      interrupt_{context.create_signal(*this, io::sys::Signal::Type::INTERRUPT)}, service_{create_service(*this, settings, context)},
+      dispatcher_{create_dispatcher(settings, config, context, params)}, incremental_{settings, context, shared_}, snapshot_{settings, context, shared_} {
 }
 
 void Controller::dispatch() {
@@ -61,6 +82,20 @@ void Controller::refresh(std::chrono::nanoseconds now) {
 void Controller::operator()(io::sys::Signal::Event const &event) {
   log::warn("*** SIGNAL: {} ***"sv, event.type);
   (*dispatcher_).stop();
+}
+
+// service::Dispatcher::Handler
+
+void Controller::operator()(metrics::Writer &) const {
+}
+
+void Controller::operator()(service::Disconnected const &) {
+}
+
+void Controller::operator()(service::Response &, service::Request const &) {
+}
+
+void Controller::operator()(Control const &, [[maybe_unused]] uint8_t user_id) {
 }
 
 // client::Poller::Handler
