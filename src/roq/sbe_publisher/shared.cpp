@@ -8,8 +8,6 @@
 
 #include "roq/utils/debug/hex/message.hpp"
 
-#include "roq/core/routing/utility.hpp"
-
 using namespace std::literals;
 
 namespace roq {
@@ -23,9 +21,9 @@ auto create_session_id() {
   return static_cast<uint16_t>(now_utc.count());
 }
 
+// important! this is internal and not going to be exposed by any API
 auto get_instrument_id_from_opaque(auto opaque) {
-  auto routing = core::routing::routing_from_opaque(opaque);
-  return routing.id;
+  return static_cast<uint32_t>(opaque);
 }
 }  // namespace
 
