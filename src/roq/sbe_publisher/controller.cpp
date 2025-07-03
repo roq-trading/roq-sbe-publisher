@@ -16,8 +16,7 @@ namespace sbe_publisher {
 namespace {
 auto const DISPATCH_THIS_MANY_BEFORE_CHECKING_CLOCK = 1000uz;
 auto const POLL_TIME = 100ns;
-auto const SLEEP_TIME = 1ms;
-auto const REFRESH_FREQ = 40ms;  // ~24 fps
+auto const SLEEP_TIME = 100ns;
 }  // namespace
 
 // === HELPERS ===
