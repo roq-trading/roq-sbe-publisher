@@ -57,6 +57,7 @@ Controller::Controller(Settings const &settings, Config const &config, io::Conte
 
 void Controller::dispatch() {
   log::info("Starting the dispatch loop..."sv);
+  (*service_).start();
   (*dispatcher_).start();
   auto success = true;
   while (success) {
