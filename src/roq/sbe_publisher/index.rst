@@ -27,7 +27,7 @@ Conda
   
   .. code-block:: bash
   
-    $ roq-sbe-publisher
+    $ roq-sbe-publisher \
           --name publisher \
           --config_file test.toml \                                                                                           
           --local_interface 192.168.188.64 \                                                                                    
