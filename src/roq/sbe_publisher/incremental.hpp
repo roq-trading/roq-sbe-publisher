@@ -8,7 +8,7 @@
 
 #include "roq/io/context.hpp"
 
-#include "roq/codec/sbe/encoder.hpp"
+#include "roq/codec/simple_binary_encoding/encoder.hpp"
 
 #include "roq/sbe_publisher/base.hpp"
 #include "roq/sbe_publisher/instrument.hpp"
@@ -30,7 +30,7 @@ struct Incremental final : public Base {
   void operator()(Instrument const &, Event<StatisticsUpdate> const &);
 
  private:
-  std::unique_ptr<codec::sbe::Encoder> encoder_;
+  std::unique_ptr<codec::simple_binary_encoding::Encoder> encoder_;
   size_t const max_depth_;
   std::vector<MBPUpdate> bids_, asks_;
 };

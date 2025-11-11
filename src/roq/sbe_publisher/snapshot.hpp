@@ -10,7 +10,7 @@
 
 #include "roq/io/context.hpp"
 
-#include "roq/codec/sbe/encoder.hpp"
+#include "roq/codec/simple_binary_encoding/encoder.hpp"
 
 #include "roq/sbe_publisher/base.hpp"
 #include "roq/sbe_publisher/instrument.hpp"
@@ -31,7 +31,7 @@ struct Snapshot final : public Base {
  private:
   std::chrono::nanoseconds const publish_freq_;
   Shared &shared_;
-  std::unique_ptr<codec::sbe::Encoder> encoder_;
+  std::unique_ptr<codec::simple_binary_encoding::Encoder> encoder_;
   std::deque<uint16_t> publish_;
   std::chrono::nanoseconds next_publish_ = {};
   size_t const max_depth_;

@@ -21,7 +21,7 @@ auto const CONTROL = codec::udp::pack(codec::udp::Encoding::SBE, codec::udp::Cha
 
 Incremental::Incremental(Settings const &settings, io::Context &context, Shared &shared)
     : Base{settings, context, shared, settings.multicast.multicast_address_incremental, settings.multicast.multicast_port_incremental},
-      encoder_{codec::sbe::Encoder::create()}, max_depth_{settings.max_depth} {
+      encoder_{codec::simple_binary_encoding::Encoder::create()}, max_depth_{settings.max_depth} {
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<ReferenceData> const &event) {

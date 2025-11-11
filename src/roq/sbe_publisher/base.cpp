@@ -10,8 +10,6 @@
 
 #include "roq/codec/udp/encoder.hpp"
 
-#include "roq/codec/sbe/encoder.hpp"
-
 using namespace std::literals;
 
 namespace roq {

@@ -4,8 +4,6 @@
 
 #include "roq/client.hpp"
 
-#include "roq/codec/sbe/encoder.hpp"
-
 using namespace std::literals;
 
 namespace roq {
