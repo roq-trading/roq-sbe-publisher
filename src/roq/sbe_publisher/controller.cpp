@@ -49,8 +49,9 @@ auto create_dispatcher(auto &settings, auto &config, auto &context, auto &params
 // === IMPLEMENTATION ===
 
 Controller::Controller(Settings const &settings, Config const &config, io::Context &context, std::span<std::string_view const> const &params)
-    : terminate_{context.create_signal(*this, io::sys::Signal::Type::TERMINATE)}, interrupt_{context.create_signal(*this, io::sys::Signal::Type::INTERRUPT)}, service_{create_service(*this, settings, context)},
-      dispatcher_{create_dispatcher(settings, config, context, params)}, incremental_{settings, context, shared_}, snapshot_{settings, context, shared_} {
+    : terminate_{context.create_signal(*this, io::sys::Signal::Type::TERMINATE)}, interrupt_{context.create_signal(*this, io::sys::Signal::Type::INTERRUPT)},
+      service_{create_service(*this, settings, context)}, dispatcher_{create_dispatcher(settings, config, context, params)},
+      incremental_{settings, context, shared_}, snapshot_{settings, context, shared_} {
 }
 
 void Controller::dispatch() {
