@@ -56,7 +56,6 @@ struct Controller final : public io::sys::Signal::Handler, public service::Dispa
   void dispatch(Event<T> const &);
 
  private:
-  io::Context &context_;
   std::unique_ptr<io::sys::Signal> terminate_;
   std::unique_ptr<io::sys::Signal> interrupt_;
   std::unique_ptr<service::Dispatcher> service_;
