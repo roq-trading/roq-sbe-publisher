@@ -35,10 +35,10 @@ requirements:
     - roq-flags
     - roq-io
     - roq-logging
-    - roq-oss-tomlplusplus
     - roq-service
     - roq-utils
     - roq-web
+    - tomlplusplus
     - unordered_dense
   run:
     - benchmark
