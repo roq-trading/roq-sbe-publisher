@@ -4,7 +4,7 @@
 
 #include "roq/logging.hpp"
 
-#include "roq/codec/udp/header.hpp"
+#include "roq/io/udp/header.hpp"
 
 #include "roq/sbe_publisher/shared.hpp"
 
@@ -16,7 +16,7 @@ namespace sbe_publisher {
 // === CONSTANTS ===
 
 namespace {
-auto const CONTROL = codec::udp::pack(codec::udp::Encoding::SBE, codec::udp::Channel::SNAPSHOT);
+auto const CONTROL = io::udp::pack(io::udp::Encoding::SBE, io::udp::Channel::SNAPSHOT);
 }
 
 // === IMPLEMENTATION ===
