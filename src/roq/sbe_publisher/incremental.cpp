@@ -25,8 +25,9 @@ Incremental::Incremental(Settings const &settings, io::Context &context, Shared 
 }
 
 void Incremental::operator()(Instrument const &instrument, Event<ReferenceData> const &event) {
+  auto &[message_info, reference_data] = event;
   assert(ready());
-  if (event.value.discard) {
+  if (reference_data.discard) {
     return;
   }
   auto message = (*encoder_)(event);
