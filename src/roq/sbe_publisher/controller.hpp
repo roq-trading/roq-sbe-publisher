@@ -30,13 +30,13 @@ struct Controller final : public io::sys::Signal::Handler, public service::Dispa
   void refresh(std::chrono::nanoseconds now);
 
   // io::sys::Signal::Handler
-  void operator()(io::sys::Signal::Event const &) override;
+  void operator()(Trace<io::sys::Signal::Event> const &) override;
 
   // service::Dispatcher::Handler
   void operator()(metrics::Writer &) const override;
-  void operator()(service::Disconnected const &) override;
-  void operator()(service::Response &, service::Request const &) override;
-  void operator()(Control const &, uint8_t user_id) override;
+  void operator()(Trace<service::Disconnected> const &) override;
+  void operator()(Trace<service::Request> const &, service::Response &) override;
+  void operator()(Trace<Control> const &, uint8_t user_id) override;
 
   // client::Poller::Handler
   void operator()(Event<Connected> const &) override;

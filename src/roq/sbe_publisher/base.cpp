@@ -70,11 +70,11 @@ Base::Base(Settings const &settings, io::Context &context, Shared &shared, std::
       sender_{create_sender<decltype(sender_)>(*this, settings, context, multicast_address, multicast_port)} {
 }
 
-void Base::operator()(io::net::udp::Sender::Error const &) {
+void Base::operator()(Trace<io::net::udp::Sender::Error> const &) {
   log::fatal("Unexpected"sv);
 }
 
-void Base::operator()(io::net::udp::Sender::Write const &) {
+void Base::operator()(Trace<io::net::udp::Sender::Write> const &) {
 }
 
 // utilities

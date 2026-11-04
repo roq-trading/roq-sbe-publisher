@@ -24,8 +24,8 @@ struct Base : public io::net::udp::Sender::Handler {
  protected:
   Base(Settings const &, io::Context &, Shared &, std::span<std::string const> const &multicast_address, uint16_t multicast_port);
 
-  void operator()(io::net::udp::Sender::Error const &) override;
-  void operator()(io::net::udp::Sender::Write const &) override;
+  void operator()(Trace<io::net::udp::Sender::Error> const &) override;
+  void operator()(Trace<io::net::udp::Sender::Write> const &) override;
 
   // utilities
 

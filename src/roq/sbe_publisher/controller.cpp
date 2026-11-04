@@ -79,8 +79,9 @@ void Controller::refresh(std::chrono::nanoseconds now) {
 
 // io::sys::Signal::Handler
 
-void Controller::operator()(io::sys::Signal::Event const &event) {
-  log::warn("*** SIGNAL: {} ***"sv, event.type);
+void Controller::operator()(Trace<io::sys::Signal::Event> const &event) {
+  auto &[trace_info, signal] = event;
+  log::warn("*** SIGNAL: {} ***"sv, signal.type);
   (*dispatcher_).stop();
 }
 
@@ -89,13 +90,13 @@ void Controller::operator()(io::sys::Signal::Event const &event) {
 void Controller::operator()(metrics::Writer &) const {
 }
 
-void Controller::operator()(service::Disconnected const &) {
+void Controller::operator()(Trace<service::Disconnected> const &) {
 }
 
-void Controller::operator()(service::Response &, service::Request const &) {
+void Controller::operator()(Trace<service::Request> const &, service::Response &) {
 }
 
-void Controller::operator()(Control const &, [[maybe_unused]] uint8_t user_id) {
+void Controller::operator()(Trace<Control> const &, [[maybe_unused]] uint8_t user_id) {
 }
 
 // client::Poller::Handler
